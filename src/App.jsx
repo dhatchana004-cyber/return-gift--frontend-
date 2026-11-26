@@ -11,7 +11,7 @@ import { CartPage, CheckoutPage, ForgotPasswordPage, LoginPage, OrdersPage, Prof
 import QuotePage from './pages/QuotePage';
 import ReturnGiftsPage from './pages/ReturnGiftsPage';
 import AdminLoginPage from './pages/AdminLoginPage';
-import { AdminCategoriesPage, AdminCustomersPage, AdminDeliveryChargeSettingsPage, AdminMessagesPage, AdminOrdersPage, AdminOverviewPage, AdminProductsPage, AdminQuotationsPage, AdminReportsPage } from './pages/AdminPages';
+import { AdminCategoriesPage, AdminCustomersPage, AdminDeliveryChargeSettingsPage, AdminMessagesPage, AdminOrdersPage, AdminOverviewPage, AdminProductsPage, AdminQuotationsPage, AdminReportsPage, AdminStorefrontSettingsPage } from './pages/AdminPages';
 
 function AdminGuard({ children }) {
   const { admin } = useAuth();
@@ -63,6 +63,7 @@ export default function App() {
         <Route path="messages" element={<AdminMessagesPage />} />
         <Route path="quotations" element={<AdminQuotationsPage />} />
         <Route path="categories" element={<AdminCategoriesPage />} />
+        <Route path="storefront-settings" element={<AdminStorefrontSettingsPage />} />
         <Route path="delivery-charge-settings" element={<AdminDeliveryChargeSettingsPage />} />
         <Route path="reports" element={<AdminReportsPage />} />
       </Route>

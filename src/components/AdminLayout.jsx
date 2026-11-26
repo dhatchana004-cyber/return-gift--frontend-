@@ -16,6 +16,7 @@ export default function AdminLayout() {
           <NavLink to="/admin/messages"><i className="bi bi-chat-dots" /> Messages</NavLink>
           <NavLink to="/admin/quotations"><i className="bi bi-envelope-paper" /> Quotations</NavLink>
           <NavLink to="/admin/categories"><i className="bi bi-tags" /> Categories</NavLink>
+          <NavLink to="/admin/storefront-settings"><i className="bi bi-sliders" /> Storefront Settings</NavLink>
           <NavLink to="/admin/delivery-charge-settings"><i className="bi bi-geo-alt" /> Delivery Charge Settings</NavLink>
           <NavLink to="/admin/reports"><i className="bi bi-bar-chart" /> Reports</NavLink>
         </nav>
