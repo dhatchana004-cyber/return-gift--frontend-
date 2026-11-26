@@ -1534,4 +1534,193 @@ select option { background: #fff; color: #3c2528; }
   }
 }
 
+/* ==========================================================
+   INLINE CATEGORY PRODUCTS PANEL (ADD MULTIPLE PRODUCTS)
+   ========================================================== */
+.category-admin-group {
+  border-top: 1px solid #ead8d5;
+}
+.category-admin-group .category-admin-row {
+  border-top: 0;
+}
+.category-products-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid #d4b8bd;
+  background: #ffffff;
+  color: #4a1521;
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+.category-products-btn:hover {
+  border-color: #8e1737;
+  color: #8e1737;
+}
+.category-products-btn.active {
+  border-color: #8e1737;
+  background: #8e1737;
+  color: #ffffff;
+}
+.category-products-panel {
+  margin: 0 0 18px;
+  padding: 20px;
+  background: #fdf9f8;
+  border: 1px solid #e6cfd2;
+  border-radius: 10px;
+}
+.category-products-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #ead8d5;
+}
+.category-products-panel-head .eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.55rem;
+}
+.category-products-panel-head h4 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  color: #421d27;
+}
+.category-products-form {
+  padding: 16px;
+  margin-bottom: 16px;
+  background: #ffffff;
+  border: 1px solid #ead8d5;
+  border-radius: 8px;
+}
+.category-products-form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.category-products-form-head strong {
+  color: #421d27;
+  font-size: 0.84rem;
+}
+.category-products-form-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr 0.6fr 0.7fr;
+  gap: 10px 12px;
+  margin-bottom: 12px;
+}
+.category-products-form-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.category-products-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.category-products-checks .admin-check {
+  margin: 0;
+}
+.category-product-items {
+  display: grid;
+  gap: 10px;
+}
+.category-product-item {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: #ffffff;
+  border: 1px solid #ead8d5;
+  border-radius: 8px;
+}
+.category-product-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f6ebe7;
+  display: grid;
+  place-items: center;
+  border: 1px solid #ead8d5;
+}
+.category-product-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.category-product-thumb span {
+  font-weight: 700;
+  color: #8e1737;
+}
+.category-product-meta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.category-product-meta strong {
+  color: #421d27;
+  font-size: 0.82rem;
+}
+.category-product-pricing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: #6b5355;
+}
+.category-product-pricing > span {
+  color: #8e1737;
+  font-weight: 700;
+}
+.category-product-pricing del {
+  color: #9b8583;
+}
+.category-product-pricing em {
+  font-style: normal;
+  padding: 2px 7px;
+  border-radius: 12px;
+  background: #8e1737;
+  color: #ffffff;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+.category-product-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.category-products-empty {
+  margin: 0;
+  padding: 12px;
+  color: #806b6c;
+  font-size: 0.75rem;
+  text-align: center;
+}
+@media (max-width: 900px) {
+  .category-products-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .category-product-item {
+    grid-template-columns: 44px 1fr;
+  }
+  .category-product-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}
+
 

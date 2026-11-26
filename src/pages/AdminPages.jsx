@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import api, { getErrorMessage } from '../services/api';
 import { useAdminFeedback } from '../components/AdminDialogs';
+import CategoryProductsPanel from '../components/CategoryProductsPanel';
 import defaultHeroGiftImg from '../assets/boutique-hero-gifts.png';
 
 function useAdminData(path) {
@@ -234,14 +235,28 @@ export function AdminQuotationsPage() {
 
 export function AdminCategoriesPage() {
   const { data, error, loading, reload } = useAdminData('/admin/categories');
+  const productsState = useAdminData('/admin/products');
   const { notify, confirmDelete } = useAdminFeedback();
   const [form, setForm] = useState({ name: '', description: '', price: '', offer_percentage: '0', is_trending: false });
   const [imageFile, setImageFile] = useState(null);
   const [uploadingId, setUploadingId] = useState(null);
   const [togglingId, setTogglingId] = useState(null);
+  const [openCategoryId, setOpenCategoryId] = useState(null);
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState({});
   const createFileRef = useRef(null);
+  const categoryGroupRefs = useRef({});
+
+  const productsByCategory = (productsState.data?.products || []).reduce((acc, product) => {
+    if (!product.category_id || !product.is_active) return acc;
+    if (!acc[product.category_id]) acc[product.category_id] = [];
+    acc[product.category_id].push(product);
+    return acc;
+  }, {});
+
+  const refreshCategoriesAndProducts = async () => {
+    await Promise.all([reload(), productsState.reload()]);
+  };
 
   const create = async (event) => {
     event.preventDefault(); setBusy(true);
@@ -254,12 +269,19 @@ export function AdminCategoriesPage() {
       payload.append('offer_percentage', form.offer_percentage !== '' ? String(Number(form.offer_percentage)) : '0');
       payload.append('is_trending', form.is_trending ? 'true' : 'false');
       if (imageFile) payload.append('image', imageFile);
-      await api.post('/admin/categories', payload);
+      const { data: res } = await api.post('/admin/categories', payload);
+      const createdId = res?.category?.id || null;
       setForm({ name: '', description: '', price: '', offer_percentage: '0', is_trending: false });
       setImageFile(null);
       if (createFileRef.current) createFileRef.current.value = '';
-      notify.success(`Category "${name}" added.`, 'Added');
-      await reload();
+      notify.success(`Category "${name}" added. You can now add products inside it.`, 'Added');
+      await refreshCategoriesAndProducts();
+      if (createdId) {
+        setOpenCategoryId(createdId);
+        window.requestAnimationFrame(() => {
+          categoryGroupRefs.current[createdId]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      }
     } catch (e) { notify.error(getErrorMessage(e)); }
     finally { setBusy(false); }
   };
@@ -312,6 +334,7 @@ export function AdminCategoriesPage() {
       onConfirm: async () => {
         try {
           await api.delete(`/admin/categories/${category.id}`);
+          if (openCategoryId === category.id) setOpenCategoryId(null);
           setEditing((prev) => {
             if (!prev[category.id]) return prev;
             const next = { ...prev };
@@ -319,7 +342,7 @@ export function AdminCategoriesPage() {
             return next;
           });
           notify.deleted(`Category "${category.name}" deleted.`);
-          await reload();
+          await refreshCategoriesAndProducts();
         } catch (e) {
           notify.error(getErrorMessage(e));
         }
@@ -345,48 +368,75 @@ export function AdminCategoriesPage() {
     </form>
     <div className="admin-section-card">
       <h3>Manage occasions & categories</h3>
-      {loading ? <p className="loading-copy">Loading categories...</p> : (data?.categories || []).map((category) => (
-        <div className="category-admin-row" key={category.id}>
-          <div className="category-admin-thumb">
-            {category.image_url ? (
-              <img src={category.image_url} alt={category.name} />
-            ) : (
-              <span>{category.name.charAt(0)}</span>
+      {loading ? <p className="loading-copy">Loading categories...</p> : (data?.categories || []).map((category) => {
+        const isOpen = openCategoryId === category.id;
+        return (
+          <div
+            className={`category-admin-group ${isOpen ? 'is-open' : ''}`}
+            key={category.id}
+            ref={(el) => {
+              if (el) categoryGroupRefs.current[category.id] = el;
+              else delete categoryGroupRefs.current[category.id];
+            }}
+          >
+            <div className="category-admin-row">
+              <div className="category-admin-thumb">
+                {category.image_url ? (
+                  <img src={category.image_url} alt={category.name} />
+                ) : (
+                  <span>{category.name.charAt(0)}</span>
+                )}
+              </div>
+              <label>Name<input value={editing[category.id]?.name ?? category.name} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], name: e.target.value } })} /></label>
+              <label className="category-admin-price-field">Amount (₹)<input type="number" min="0" step="0.01" value={editing[category.id]?.price ?? category.price ?? '0'} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], price: e.target.value } })} /></label>
+              <label className="category-admin-offer-field">Offer (%)<input type="number" min="0" max="100" step="1" value={editing[category.id]?.offer_percentage ?? category.offer_percentage ?? '0'} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], offer_percentage: e.target.value } })} /></label>
+              <label>Description<input value={editing[category.id]?.description ?? category.description ?? ''} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], description: e.target.value } })} /></label>
+              <label className="category-upload-btn" title="Upload new category image">
+                <i className="bi bi-cloud-arrow-up" /> {uploadingId === category.id ? 'Uploading…' : 'Upload Image'}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  disabled={uploadingId === category.id}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    e.target.value = '';
+                    if (file) uploadCategoryImage(category, file);
+                  }}
+                />
+              </label>
+              <button
+                type="button"
+                className={`admin-trending-badge ${category.is_trending ? 'active' : ''}`}
+                disabled={togglingId === category.id}
+                onClick={() => toggleCategoryTrending(category)}
+                title="Show/hide in homepage Trending Now section"
+              >
+                {category.is_trending ? '★ Trending Now' : '☆ Trending Now'}
+              </button>
+              <button
+                type="button"
+                className={`category-products-btn ${isOpen ? 'active' : ''}`}
+                onClick={() => setOpenCategoryId(isOpen ? null : category.id)}
+                title="View & add unlimited products in this category"
+              >
+                <i className={`bi ${isOpen ? 'bi-chevron-up' : 'bi-plus-circle'}`} /> {isOpen ? 'Hide' : 'Products'} ({category.product_count})
+              </button>
+              <div className="category-admin-actions">
+                <button type="button" className="text-button" onClick={() => save(category.id)}>Save</button>
+                <button type="button" className="text-button danger-link" onClick={() => remove(category)}>Delete</button>
+              </div>
+            </div>
+            {isOpen && (
+              <CategoryProductsPanel
+                category={category}
+                products={productsByCategory[category.id] || []}
+                onClose={() => setOpenCategoryId(null)}
+                onChanged={refreshCategoriesAndProducts}
+              />
             )}
           </div>
-          <label>Name<input value={editing[category.id]?.name ?? category.name} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], name: e.target.value } })} /></label>
-          <label className="category-admin-price-field">Amount (₹)<input type="number" min="0" step="0.01" value={editing[category.id]?.price ?? category.price ?? '0'} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], price: e.target.value } })} /></label>
-          <label className="category-admin-offer-field">Offer (%)<input type="number" min="0" max="100" step="1" value={editing[category.id]?.offer_percentage ?? category.offer_percentage ?? '0'} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], offer_percentage: e.target.value } })} /></label>
-          <label>Description<input value={editing[category.id]?.description ?? category.description ?? ''} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], description: e.target.value } })} /></label>
-          <label className="category-upload-btn" title="Upload new category image">
-            <i className="bi bi-cloud-arrow-up" /> {uploadingId === category.id ? 'Uploading…' : 'Upload Image'}
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              disabled={uploadingId === category.id}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                e.target.value = '';
-                if (file) uploadCategoryImage(category, file);
-              }}
-            />
-          </label>
-          <button
-            type="button"
-            className={`admin-trending-badge ${category.is_trending ? 'active' : ''}`}
-            disabled={togglingId === category.id}
-            onClick={() => toggleCategoryTrending(category)}
-            title="Show/hide in homepage Trending Now section"
-          >
-            {category.is_trending ? '★ Trending Now' : '☆ Trending Now'}
-          </button>
-          <span>{category.product_count} products</span>
-          <div className="category-admin-actions">
-            <button type="button" className="text-button" onClick={() => save(category.id)}>Save</button>
-            <button type="button" className="text-button danger-link" onClick={() => remove(category)}>Delete</button>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   </>;
 }
