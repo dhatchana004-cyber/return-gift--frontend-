@@ -180,60 +180,125 @@ export function AdminQuotationsPage() {
 
 export function AdminCategoriesPage() {
   const { data, error, loading, reload, setError } = useAdminData('/admin/categories');
-  const [form, setForm] = useState({ name: '', description: '', image_url: '' });
+  const [form, setForm] = useState({ name: '', description: '', is_trending: false });
+  const [imageFile, setImageFile] = useState(null);
+  const [uploadingId, setUploadingId] = useState(null);
+  const [togglingId, setTogglingId] = useState(null);
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState({});
+  const createFileRef = useRef(null);
+
   const create = async (event) => {
     event.preventDefault(); setBusy(true); setError(''); setNotice('');
     try {
-      await api.post('/admin/categories', form);
-      setForm({ name: '', description: '', image_url: '' });
+      const payload = new FormData();
+      payload.append('name', form.name.trim());
+      payload.append('description', form.description.trim());
+      payload.append('is_trending', form.is_trending ? 'true' : 'false');
+      if (imageFile) payload.append('image', imageFile);
+      await api.post('/admin/categories', payload);
+      setForm({ name: '', description: '', is_trending: false });
+      setImageFile(null);
+      if (createFileRef.current) createFileRef.current.value = '';
       setNotice('Category added.');
       await reload();
     } catch (e) { setError(getErrorMessage(e)); }
     finally { setBusy(false); }
   };
+
+  const uploadCategoryImage = async (category, file) => {
+    if (!file) return;
+    setUploadingId(category.id); setError(''); setNotice('');
+    try {
+      const payload = new FormData();
+      payload.append('image', file);
+      await api.post(`/admin/categories/${category.id}/image`, payload);
+      setNotice(`Image updated for "${category.name}".`);
+      await reload();
+    } catch (e) { setError(getErrorMessage(e)); }
+    finally { setUploadingId(null); }
+  };
+
+  const toggleCategoryTrending = async (category) => {
+    setTogglingId(category.id); setError(''); setNotice('');
+    try {
+      const { data: res } = await api.post(`/admin/categories/${category.id}/trending`);
+      setNotice(`"${category.name}" ${res.category?.is_trending ? 'added to' : 'removed from'} Trending Now.`);
+      await reload();
+    } catch (e) { setError(getErrorMessage(e)); }
+    finally { setTogglingId(null); }
+  };
+
   const save = async (id) => {
     setError(''); setNotice('');
     try {
-      await api.patch(`/admin/categories/${id}`, editing[id]);
+      await api.patch(`/admin/categories/${id}`, editing[id] || {});
       setNotice('Category updated.');
       await reload();
     } catch (e) { setError(getErrorMessage(e)); }
   };
+
   const remove = async (category) => {
     if (!window.confirm(`Delete "${category.name}"? Products in this category will remain in your catalog.`)) return;
     try { await api.delete(`/admin/categories/${category.id}`); setNotice('Category deleted.'); await reload(); }
     catch (e) { setError(getErrorMessage(e)); }
   };
+
   return <><div className="admin-page-heading"><div><p className="eyebrow">OCCASIONS & BOUTIQUE COLLECTIONS</p><h1>Categories</h1></div></div><AdminFeedback error={error} notice={notice} />
     <form className="admin-form-card category-create" onSubmit={create}>
       <h3>Add a category</h3>
       <div className="category-form-row">
-        <label>Category name<input required minLength="2" maxLength="100" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Sarees" /></label>
-        <label>Image URL (for homepage circular card)<input type="url" maxLength="1000" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." /></label>
+        <label>Category name<input required minLength="2" maxLength="100" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Return Gifts" /></label>
+        <label>Upload image <span className="optional">(JPG/PNG/WEBP, max 5 MB)</span><input ref={createFileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => setImageFile(e.target.files?.[0] || null)} /></label>
         <label>Description<input maxLength="1000" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Brief description" /></label>
-        <button className="button button-dark" disabled={busy}>Add category</button>
+        <button className="button button-dark" disabled={busy}>{busy ? 'Adding...' : 'Add category'}</button>
       </div>
+      <label className="admin-check" style={{ marginTop: 12 }}>
+        <input type="checkbox" checked={form.is_trending} onChange={(e) => setForm({ ...form, is_trending: e.target.checked })} />
+        <strong>Show in Trending Now</strong> (Feature this category on homepage Trending Now)
+      </label>
     </form>
     <div className="admin-section-card">
       <h3>Manage occasions & categories</h3>
       {loading ? <p className="loading-copy">Loading categories...</p> : (data?.categories || []).map((category) => (
         <div className="category-admin-row" key={category.id}>
           <div className="category-admin-thumb">
-            {(editing[category.id]?.image_url ?? category.image_url) ? (
-              <img src={editing[category.id]?.image_url ?? category.image_url} alt={category.name} />
+            {category.image_url ? (
+              <img src={category.image_url} alt={category.name} />
             ) : (
               <span>{category.name.charAt(0)}</span>
             )}
           </div>
           <label>Name<input value={editing[category.id]?.name ?? category.name} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], name: e.target.value } })} /></label>
-          <label className="category-admin-url-field">Image URL<input type="url" placeholder="https://images.unsplash.com/..." value={editing[category.id]?.image_url ?? category.image_url ?? ''} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], image_url: e.target.value } })} /></label>
           <label>Description<input value={editing[category.id]?.description ?? category.description ?? ''} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], description: e.target.value } })} /></label>
+          <label className="category-upload-btn" title="Upload new category image">
+            <i className="bi bi-cloud-arrow-up" /> {uploadingId === category.id ? 'Uploading…' : 'Upload Image'}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              disabled={uploadingId === category.id}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                e.target.value = '';
+                if (file) uploadCategoryImage(category, file);
+              }}
+            />
+          </label>
+          <button
+            type="button"
+            className={`admin-trending-badge ${category.is_trending ? 'active' : ''}`}
+            disabled={togglingId === category.id}
+            onClick={() => toggleCategoryTrending(category)}
+            title="Show/hide in homepage Trending Now section"
+          >
+            {category.is_trending ? '★ Trending Now' : '☆ Trending Now'}
+          </button>
           <span>{category.product_count} products</span>
-          <button className="text-button" onClick={() => save(category.id)}>Save</button>
-          <button className="text-button danger-link" onClick={() => remove(category)}>Delete</button>
+          <div className="category-admin-actions">
+            <button type="button" className="text-button" onClick={() => save(category.id)}>Save</button>
+            <button type="button" className="text-button danger-link" onClick={() => remove(category)}>Delete</button>
+          </div>
         </div>
       ))}
     </div>

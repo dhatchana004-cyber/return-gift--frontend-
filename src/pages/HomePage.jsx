@@ -87,6 +87,9 @@ export default function HomePage() {
     return a.name.localeCompare(b.name);
   });
 
+  const trendingCategories = sortedCategories.filter((category) => category.is_trending);
+  const totalTrendingCount = trendingCategories.length + trendingProducts.length;
+
   const heroImgSrc =
     !settings.hero_image_url || settings.hero_image_url === '/boutique-hero-gifts.png'
       ? defaultHeroGiftImg
@@ -139,10 +142,10 @@ export default function HomePage() {
 
         {error && <div className="alert alert-danger">{error}</div>}
 
-        {trendingProducts.length === 0 ? (
+        {totalTrendingCount === 0 ? (
           <div className="trending-empty-container">
             <p className="trending-empty-text">
-              No trending items currently selected. Select "Make as Trending" in the Admin Panel to feature items here.
+              No trending items currently selected. Select "Trending Now" in the Admin Panel to feature items here.
             </p>
             <button className="trending-arrow-btn" aria-label="Next">
               <i className="bi bi-chevron-right" />
@@ -150,7 +153,7 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="trending-slider-wrapper">
-            {trendingProducts.length > 3 && (
+            {totalTrendingCount > 3 && (
               <button
                 className="trending-arrow-btn slider-prev"
                 onClick={() => scrollTrending('left')}
@@ -160,13 +163,40 @@ export default function HomePage() {
               </button>
             )}
             <div className="trending-products-slider" ref={sliderRef}>
+              {trendingCategories.map((category) => (
+                <div className="trending-product-item" key={`cat-${category.id}`}>
+                  <Link
+                    to={`/return-gifts?category=${category.slug}`}
+                    className="trending-category-card"
+                  >
+                    <div className="trending-category-media">
+                      {category.image_url ? (
+                        <img src={category.image_url} alt={category.name} loading="lazy" />
+                      ) : (
+                        <div className="product-image-placeholder">
+                          <span>{category.name.charAt(0)}</span>
+                        </div>
+                      )}
+                      <span className="product-tag">TRENDING NOW</span>
+                    </div>
+                    <div className="trending-category-body">
+                      <span className="eyebrow">COLLECTION</span>
+                      <h3>{category.name}</h3>
+                      {category.description && <p>{category.description}</p>}
+                      <span className="trending-category-cta">
+                        EXPLORE COLLECTION <i className="bi bi-arrow-right" />
+                      </span>
+                    </div>
+                  </Link>
+                </div>
+              ))}
               {trendingProducts.map((product) => (
-                <div className="trending-product-item" key={product.id}>
+                <div className="trending-product-item" key={`prod-${product.id}`}>
                   <ProductCard product={product} onAdd={add} onBuy={buy} />
                 </div>
               ))}
             </div>
-            {trendingProducts.length > 3 && (
+            {totalTrendingCount > 3 && (
               <button
                 className="trending-arrow-btn slider-next"
                 onClick={() => scrollTrending('right')}
