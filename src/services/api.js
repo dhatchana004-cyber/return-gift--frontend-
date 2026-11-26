@@ -40,6 +40,26 @@ api.interceptors.response.use(undefined, async (error) => {
 
 export function getErrorMessage(error) {
   const response = error.response?.data;
+  if (
+    typeof response?.error === 'string' &&
+    response.error &&
+    response.error !== 'Please check the submitted information.'
+  ) {
+    return response.error;
+  }
+  if (response?.details && typeof response.details === 'object') {
+    const firstDetail = Object.entries(response.details)
+      .flatMap(([key, val]) => {
+        const items = Array.isArray(val)
+          ? val
+          : typeof val === 'object' && val !== null
+            ? Object.values(val).flat()
+            : [val];
+        return items.map((msg) => (key === 'non_field_errors' ? String(msg) : `${key}: ${msg}`));
+      })
+      .find(Boolean);
+    if (firstDetail) return firstDetail;
+  }
   return response?.error || (typeof response?.detail === 'string' ? response.detail : null)
     || error.message || 'Something went wrong. Please try again.';
 }
