@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api, { getErrorMessage } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import defaultHeroGiftImg from '../assets/boutique-hero-gifts.png';
 
 const defaultBoutiqueSettings = {
@@ -16,15 +15,7 @@ const defaultBoutiqueSettings = {
   trending_title: 'Trending Now',
 };
 
-const experienceSteps = [
-  ['bi-chat-heart', 'CONSULTATION', 'Discuss your event theme, guest list, and vision with our dedicated gifting concierge.'],
-  ['bi-stars', 'CUSTOMIZATION', 'Select products, bespoke packaging, ribbons and personalized name tags or logos.'],
-  ['bi-flower1', 'CURATION', 'Our artisans carefully prepare and arrange every gift.'],
-  ['bi-box-seam', 'DELIVERY', 'Relax as we handle the logistics, ensuring pristine, on-time delivery to your venue.'],
-];
-
 export default function HomePage() {
-  const [products, setProducts] = useState([]);
   const [trendingProducts, setTrendingProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [settings, setSettings] = useState(defaultBoutiqueSettings);
@@ -39,8 +30,7 @@ export default function HomePage() {
       api.get('/storefront-settings'),
       api.get('/products?trending=true'),
       api.get('/categories'),
-      api.get('/products?limit=6&sort=newest'),
-    ]).then(([settingsRes, trendingRes, catRes, prodRes]) => {
+    ]).then(([settingsRes, trendingRes, catRes]) => {
       if (settingsRes.status === 'fulfilled' && settingsRes.value?.data?.settings) {
         setSettings(settingsRes.value.data.settings);
       }
@@ -49,9 +39,6 @@ export default function HomePage() {
       }
       if (catRes.status === 'fulfilled' && catRes.value?.data?.categories) {
         setCategories(catRes.value.data.categories);
-      }
-      if (prodRes.status === 'fulfilled' && prodRes.value?.data?.products) {
-        setProducts(prodRes.value.data.products);
       }
     });
   }, []);
@@ -80,7 +67,6 @@ export default function HomePage() {
   const mainPart = parts[0] || '';
   const accentPart = parts.slice(1).join(' ');
 
-  // Order categories prioritizing the ones shown in image
   const prioritySlugs = [
     'sarees',
     'suits-kurtis',
@@ -108,7 +94,7 @@ export default function HomePage() {
 
   return (
     <>
-      {/* 1. THE BOUTIQUE EXPERIENCE HERO (Replaces Curated Elegance) */}
+      {/* 1. THE BOUTIQUE EXPERIENCE HERO */}
       <section className="boutique-experience-hero">
         <div className="boutique-hero-grid">
           <div className="boutique-hero-inner">
@@ -150,6 +136,8 @@ export default function HomePage() {
             VIEW ALL COLLECTION <i className="bi bi-chevron-right" />
           </Link>
         </div>
+
+        {error && <div className="alert alert-danger">{error}</div>}
 
         {trendingProducts.length === 0 ? (
           <div className="trending-empty-container">
@@ -215,52 +203,6 @@ export default function HomePage() {
               </div>
               <span className="category-circle-label">{category.name}</span>
             </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* 4. FEATURED PRODUCTS COLLECTION */}
-      <section className="section featured-section">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">VEDHIKA BRAND · RETURN GIFTS</p>
-            <h2>Considered gifts. <em>Lasting impressions.</em></h2>
-          </div>
-          <Link to="/return-gifts" className="text-link">VIEW RETURN GIFTS <span>→</span></Link>
-        </div>
-        {error && <div className="alert alert-danger">{error}</div>}
-        {products.length ? (
-          <div className="product-grid">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} onAdd={add} onBuy={buy} />
-            ))}
-          </div>
-        ) : (
-          <div className="empty-collection">
-            <span>V</span>
-            <h3>The VEDHIKA collection is being curated.</h3>
-            <p>Visit again soon or tell us what you’re celebrating.</p>
-            <Link to="/quote" className="button button-gold">REQUEST A QUOTE</Link>
-          </div>
-        )}
-      </section>
-
-      {/* 5. THE VEDHIKA EXPERIENCE */}
-      <section className="section experience-section">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">THE VEDHIKA EXPERIENCE</p>
-            <h2>Thoughtfully curated, <em>beautifully delivered.</em></h2>
-          </div>
-        </div>
-        <div className="experience-grid">
-          {experienceSteps.map(([icon, title, copy], index) => (
-            <article className="experience-step" key={title}>
-              <span className="experience-icon"><i className={`bi ${icon}`} /></span>
-              <span className="experience-number">0{index + 1}</span>
-              <h3>{title}</h3>
-              <p>{copy}</p>
-            </article>
           ))}
         </div>
       </section>
