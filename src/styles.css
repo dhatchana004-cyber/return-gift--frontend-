@@ -565,25 +565,25 @@ textarea { min-height: 90px; resize: vertical; }
 /* Warm boutique palette inspired by the supplied return-gift design. */
 :root {
   color: #381b21;
-  background: #fffaf6;
-  --black: #fffaf6;
-  --panel: #fff;
-  --panel-soft: #fff1ed;
+  background: #ffffff;
+  --black: #ffffff;
+  --panel: #ffffff;
+  --panel-soft: #f8f8f8;
   --gold: #a82043;
   --gold-light: #8d1737;
   --white: #381b21;
   --muted: #866f70;
-  --line: #ead8d5;
+  --line: #eaeaea;
 }
 
-body { background: #fffaf6; color: #381b21; }
+body { background: #ffffff; color: #381b21; }
 h1, h2, h3, h4 { color: #421c25; }
 h1 em, h2 em { color: #941b3c; }
 ::selection { color: #fff; background: #941b3c; }
 
-.announcement { background: #f7e5df; color: #6d4348; }
+.announcement { background: #f8f8f8; color: #5c3a40; border-bottom: 1px solid #eeeeee; }
 .announcement span { color: #9c2142; }
-.site-header { background: #fffaf6f5; border-bottom-color: #e8cfca; box-shadow: 0 3px 16px #6225310b; }
+.site-header { background: #fffffff5; border-bottom-color: #eeeeee; box-shadow: 0 3px 16px rgba(0, 0, 0, 0.04); }
 .brand { color: #521a2a; }
 .brand small, .admin-brand small { color: #93777a; }
 .brand-mark { border-color: #9b2140; color: #9b2140; }
@@ -593,7 +593,7 @@ h1 em, h2 em { color: #941b3c; }
 .header-actions > a, .header-actions > button { color: #5a3740; }
 .header-actions > a:hover, .header-actions > button:hover { color: #991b3c; }
 .header-actions a span { background: #9d1c3e; color: #fff; }
-.header-search { background: #fffaf6; border-color: #dcbab5; box-shadow: 0 12px 30px #4f17201a; }
+.header-search { background: #ffffff; border-color: #e2e2e2; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08); }
 
 .hero {
   background:
@@ -621,7 +621,7 @@ h1 em, h2 em { color: #941b3c; }
 .text-link { border-bottom-color: #b95f71; color: #861b37; }
 .text-link:hover { color: #541222; }
 
-.section, .featured-section, .experience-section { background: #fffaf6; }
+.section, .featured-section, .experience-section { background: #ffffff; }
 .section-heading h2 { color: #411d27; }
 .product-card, .admin-section-card, .admin-form-card, .checkout-panel, .order-card, .message-card {
   background: #fff;
@@ -650,17 +650,17 @@ h1 em, h2 em { color: #941b3c; }
 .experience-number { color: #987d7c; }
 .experience-step p { color: #806c6c; }
 
-.quote-section { border-color: #ead4d0; background: linear-gradient(135deg, #f8e7e1, #fff8f3 60%); }
+.quote-section { border-color: #ececec; background: #ffffff; }
 .quote-intro h2 { color: #421d27; }
 .quote-intro > p:not(.eyebrow), .quote-assurance { color: #765d5e; }
 .quote-assurance i { color: #99203e; }
-.quote-form, .contact-form { background: #fff; border-color: #e4c5c0; box-shadow: 0 10px 32px #60232b0d; }
+.quote-form, .contact-form { background: #fff; border-color: #e6e6e6; box-shadow: 0 10px 32px rgba(0, 0, 0, 0.05); }
 .quote-form-heading h2 { color: #411d27; }
 .quote-form-heading > p:last-child { color: #806b6c; }
 label { color: #563a3d; }
 input, select, textarea {
-  border-color: #dfcbc7;
-  background: #fffdfb;
+  border-color: #dcdcdc;
+  background: #ffffff;
   color: #3c2528;
 }
 input:focus, select:focus, textarea:focus { border-color: #9a2140; box-shadow: 0 0 0 2px #9a21401a; }
@@ -679,24 +679,24 @@ select option { background: #fff; color: #3c2528; }
 }
 .return-gifts-hero h1 { color: #421b27; }
 .return-gifts-hero > p:not(.eyebrow) { color: #674b4d; }
-.return-gifts-collection { background: #fffaf6; }
-.return-category-list a { border-color: #e4ceca; background: #fff; color: #614548; }
+.return-gifts-collection { background: #ffffff; }
+.return-category-list a { border-color: #e4e4e4; background: #fff; color: #614548; }
 .return-category-list a:hover, .return-category-list a.active { border-color: #9b2140; background: #8e1737; color: #fff; }
 .shop-intro h1 { color: #421d27; }
 .shop-intro > p:last-child, .result-count { color: #806c6c; }
-.shop-controls > select, .price-filter summary { border-color: #dfcbc7; background: #fff; color: #523638; }
-.search-field { border-color: #dfcbc7; color: #91203e; background: #fff; }
-.price-filter-box { background: #fff; border-color: #dfc5c0; box-shadow: 0 8px 20px #63252c12; }
-.empty-collection { border-color: #ead8d5; background: #fff; }
+.shop-controls > select, .price-filter summary { border-color: #e2e2e2; background: #fff; color: #523638; }
+.search-field { border-color: #e2e2e2; color: #91203e; background: #fff; }
+.price-filter-box { background: #fff; border-color: #e2e2e2; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07); }
+.empty-collection { border-color: #eaeaea; background: #fff; }
 .empty-collection > span { color: #951f3e; }
 .empty-collection h3 { color: #421d27; }
 .empty-collection p, .loading-copy { color: #806c6c; }
 
-.detail-page { background: #fffaf6; }
+.detail-page { background: #ffffff; }
 .breadcrumbs { color: #8a7776; }
 .breadcrumbs a:hover { color: #8e1737; }
-.detail-image { background: #f7e9e4; }
-.detail-thumbnails button { border-color: #e5d3d0; background: #fff; }
+.detail-image { background: #f9f9f9; }
+.detail-thumbnails button { border-color: #e5e5e5; background: #fff; }
 .detail-thumbnails button.active { border-color: #9b2140; }
 .detail-copy h1 { color: #421d27; }
 .detail-price { color: #8e1737; }
@@ -704,16 +704,16 @@ select option { background: #fff; color: #3c2528; }
 .stock-note { color: #654f51; }
 .stock-note span { background: #5b9668; }
 .stock-note.out-of-stock span { background: #ad4b55; }
-.custom-note { border-color: #e4c9c3; background: #fff4f0; color: #745c5e; }
+.custom-note { border-color: #ececec; background: #fafafa; color: #745c5e; }
 .custom-note i, .custom-note strong { color: #8f1c3a; }
-.quantity-control { border-color: #dfcbc7; background: #fff; }
+.quantity-control { border-color: #e2e2e2; background: #fff; }
 .quantity-control button { color: #8e1737; }
 .detail-wishlist { color: #68484b; }
 .detail-wishlist:hover, .detail-wishlist.is-saved { color: #941d3d; }
-.detail-perks { border-top-color: #ead8d5; color: #806c6c; }
+.detail-perks { border-top-color: #eaeaea; color: #806c6c; }
 .detail-perks i { color: #941d3d; }
 
-.cart-page, .checkout-page, .orders-page, .wishlist-page { background: #fffaf6; }
+.cart-page, .checkout-page, .orders-page, .wishlist-page { background: #ffffff; }
 .cart-item, .cart-items { border-color: #ead8d5; }
 .cart-thumbnail { background: #f8e9e4; color: #8e1737; }
 .cart-item-info > a { color: #421d27; }
@@ -741,22 +741,22 @@ select option { background: #fff; color: #3c2528; }
 .status-cancelled, .status-failed { border-color: #d6a8a8; color: #8c3640; background: #fff3f1; }
 .status-pending, .status-confirmed, .status-processing, .status-shipped { border-color: #d2a0a9; color: #82203a; background: #fff5f2; }
 
-.auth-page { background: radial-gradient(ellipse at 50% 20%, #f8e7e0, #fffaf6 68%); }
-.auth-card { border-color: #e3c2bc; background: #fff; box-shadow: 0 14px 40px #55202a10; }
+.auth-page { background: #ffffff; }
+.auth-card { border-color: #eaeaea; background: #fff; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.06); }
 .auth-flower { border-color: #98203e; color: #98203e; }
 .auth-card h1 { color: #421d27; }
 .auth-card > p:not(.eyebrow):not(.auth-switch) { color: #806b6c; }
 .auth-switch { color: #765f61; }
 .auth-switch a { color: #8b1938; }
-.alert-danger { border-color: #d2a0a0; background: #fff1ef; color: #8a2635; }
-.alert-success { border-color: #d0a1a5; background: #fff4f1; color: #781b33; }
+.alert-danger { border-color: #d2a0a0; background: #fff5f5; color: #8a2635; }
+.alert-success { border-color: #d0a1a5; background: #fff6f7; color: #781b33; }
 
-.about-hero { background: linear-gradient(#fff4efc8, #fff4efdd), url('./assets/boutique-hero-gifts.png') center 55% / cover; }
+.about-hero { background: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.90)), url('./assets/boutique-hero-gifts.png') center 55% / cover; }
 .about-hero h1 { color: #421d27; }
 .about-hero > p:last-child { color: #674e50; }
 .about-story h2 { color: #421d27; }
 .about-story p:not(.eyebrow) { color: #796566; }
-.values-grid > div { border-top-color: #9c2140; background: #fff; box-shadow: 0 5px 18px #63252c0a; }
+.values-grid > div { border-top-color: #9c2140; background: #fff; box-shadow: 0 5px 18px rgba(0, 0, 0, 0.04); }
 .values-grid span { color: #97203e; }
 .values-grid h3 { color: #421d27; }
 .values-grid p { color: #806b6c; }
@@ -769,21 +769,21 @@ select option { background: #fff; color: #3c2528; }
 .policy-page h1 { color: #421d27; }
 .policy-page > p:not(.eyebrow) { color: #796566; }
 
-.site-footer { border-top-color: #dfbfba; background: #f8e9e4; }
+.site-footer { border-top-color: #eeeeee; background: #fafafa; }
 .footer-main p { color: #765f61; }
 .footer-main h3 { color: #7e1833; }
 .footer-main > div > a:not(.brand) { color: #63494c; }
 .footer-main > div > a:hover { color: #8e1737; }
 .footer-social { color: #8e1737; }
-.footer-bottom { border-top-color: #e4cfca; color: #806b6c; }
+.footer-bottom { border-top-color: #eaeaea; color: #806b6c; }
 .footer-bottom a:hover { color: #8e1737; }
 
-.admin-shell { background: #fffaf6; }
-.admin-sidebar { border-right-color: #e4c9c3; background: #f8e9e4; }
+.admin-shell { background: #ffffff; }
+.admin-sidebar { border-right-color: #eaeaea; background: #fafafa; }
 .admin-sidebar nav a { color: #644b4e; }
-.admin-sidebar nav a:hover, .admin-sidebar nav a.active { background: #efd8d5; color: #811a36; }
-.admin-logout { border-color: #dec1bd; background: #fffaf6; color: #684c50; }
-.admin-topbar { border-bottom-color: #ead8d5; }
+.admin-sidebar nav a:hover, .admin-sidebar nav a.active { background: #f3e6e9; color: #811a36; }
+.admin-logout { border-color: #e2e2e2; background: #ffffff; color: #684c50; }
+.admin-topbar { border-bottom-color: #eeeeee; }
 .admin-topbar h2, .admin-page-heading h1 { color: #421d27; }
 .view-store { color: #8c1a38; }
 .admin-page-heading > span { color: #806b6c; }
@@ -817,20 +817,20 @@ select option { background: #fff; color: #3c2528; }
 .quotation-card > p strong { color: #8c1a38; }
 
 @media (max-width: 760px) {
-  .main-nav { border-bottom-color: #e4c9c3; background: #fffaf6; }
-  .main-nav a { border-bottom-color: #ead8d5; color: #563a3c; }
-  .admin-sidebar { border-bottom-color: #e4c9c3; }
+  .main-nav { border-bottom-color: #eaeaea; background: #ffffff; }
+  .main-nav a { border-bottom-color: #eeeeee; color: #563a3c; }
+  .admin-sidebar { border-bottom-color: #eaeaea; }
 }
 
 /* ==========================================================
    BOUTIQUE EXPERIENCE HERO (Image 1)
    ========================================================== */
 .boutique-experience-hero {
-  background: #FAF6F2;
+  background: #ffffff;
   color: #2B1118;
   padding: clamp(48px, 6vw, 85px) 8% clamp(48px, 6vw, 75px);
   position: relative;
-  border-bottom: 1px solid #E8DFD8;
+  border-bottom: 1px solid #eeeeee;
 }
 .boutique-hero-grid {
   display: grid;
@@ -854,9 +854,9 @@ select option { background: #fff; color: #3c2528; }
   aspect-ratio: 4 / 3;
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid #DFCFC5;
-  background: #F4EDE6;
-  box-shadow: 0 22px 48px rgba(74, 21, 33, 0.10);
+  border: 1px solid #e8e8e8;
+  background: #ffffff;
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.06);
 }
 .boutique-hero-frame::after {
   content: '';
@@ -940,9 +940,9 @@ select option { background: #fff; color: #3c2528; }
    TRENDING NOW SECTION (Image 2)
    ========================================================== */
 .trending-now-section {
-  background: #FAF6F2;
+  background: #ffffff;
   padding: 60px 8% 70px;
-  border-bottom: 1px solid #E8DFD8;
+  border-bottom: 1px solid #eeeeee;
 }
 .trending-header {
   display: flex;
@@ -1014,7 +1014,7 @@ select option { background: #fff; color: #3c2528; }
 }
 .trending-arrow-btn:hover {
   transform: scale(1.05);
-  background: #FAF6F2;
+  background: #f9f9f9;
   box-shadow: 0 5px 16px rgba(74, 21, 33, 0.16);
 }
 .trending-slider-wrapper {
@@ -1048,7 +1048,7 @@ select option { background: #fff; color: #3c2528; }
    SHOP BY CATEGORY SECTION (Image 2)
    ========================================================== */
 .shop-by-category-section {
-  background: #FAF6F2;
+  background: #ffffff;
   padding: 70px 8% 85px;
   text-align: center;
 }
@@ -1193,13 +1193,13 @@ select option { background: #fff; color: #3c2528; }
   }
 }
 .storefront-preview-card {
-  background: #FAF6F2 !important;
-  border: 1px solid #EBDCD3 !important;
-  box-shadow: 0 4px 16px rgba(74, 21, 33, 0.06);
+  background: #ffffff !important;
+  border: 1px solid #eaeaea !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 }
 .storefront-preview-box {
   padding: 20px;
-  background: #FAF6F2;
+  background: #ffffff;
   border-radius: 4px;
 }
 
