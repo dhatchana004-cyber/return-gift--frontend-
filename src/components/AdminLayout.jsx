@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { AdminFeedbackProvider } from './AdminDialogs';
 
 export default function AdminLayout() {
   const { admin, logout } = useAuth();
@@ -24,7 +25,11 @@ export default function AdminLayout() {
       </aside>
       <section className="admin-main">
         <header className="admin-topbar"><div><span className="eyebrow">BOUTIQUE MANAGEMENT</span><h2>Good day, {admin?.name?.split(' ')[0] || 'there'}</h2></div><a href="/" className="view-store"><i className="bi bi-arrow-up-right" /> View storefront</a></header>
-        <div className="admin-content"><Outlet /></div>
+        <div className="admin-content">
+          <AdminFeedbackProvider>
+            <Outlet />
+          </AdminFeedbackProvider>
+        </div>
       </section>
     </div>
   );

@@ -1350,3 +1350,188 @@ select option { background: #fff; color: #3c2528; }
   border-radius: 4px;
 }
 
+/* ==========================================================
+   ADMIN TOAST POP NOTIFICATIONS & CONFIRM MODAL POPUP
+   ========================================================== */
+.button-danger {
+  border-color: #8e1737;
+  background: #8e1737;
+  color: #ffffff;
+}
+.button-danger:hover {
+  border-color: #6d1029;
+  background: #6d1029;
+  color: #ffffff;
+}
+.admin-toast-stack {
+  position: fixed;
+  top: 22px;
+  right: 24px;
+  z-index: 2100;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(380px, calc(100vw - 32px));
+  pointer-events: none;
+}
+.admin-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid #e2c5c8;
+  border-left: 4px solid #8e1737;
+  border-radius: 10px;
+  box-shadow: 0 14px 36px rgba(66, 29, 39, 0.18);
+  animation: admin-toast-in 0.24s ease-out both;
+}
+.admin-toast-success {
+  border-left-color: #2c6e49;
+}
+.admin-toast-deleted {
+  border-left-color: #8e1737;
+}
+.admin-toast-error {
+  border-left-color: #b42318;
+  background: #fff9f9;
+}
+.admin-toast-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 0.95rem;
+}
+.admin-toast-success .admin-toast-icon {
+  background: #edf7f0;
+  color: #2c6e49;
+}
+.admin-toast-deleted .admin-toast-icon {
+  background: #f9ebee;
+  color: #8e1737;
+}
+.admin-toast-error .admin-toast-icon {
+  background: #fdecec;
+  color: #b42318;
+}
+.admin-toast-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.admin-toast-body strong {
+  color: #421d27;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.admin-toast-body span {
+  color: #6c5557;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  word-break: break-word;
+}
+.admin-toast-close {
+  border: 0;
+  padding: 2px 4px;
+  background: transparent;
+  color: #8f7779;
+  font-size: 0.78rem;
+  line-height: 1;
+}
+.admin-toast-close:hover {
+  color: #421d27;
+}
+@keyframes admin-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2050;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(34, 14, 20, 0.48);
+  backdrop-filter: blur(3px);
+  animation: admin-modal-fade 0.16s ease-out both;
+}
+.admin-modal-card {
+  width: min(420px, 100%);
+  padding: 28px 26px 24px;
+  background: #ffffff;
+  border: 1px solid #ead8d5;
+  border-radius: 14px;
+  box-shadow: 0 22px 54px rgba(42, 16, 23, 0.28);
+  text-align: center;
+}
+.admin-modal-icon {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: #f9ebee;
+  color: #8e1737;
+  display: grid;
+  place-items: center;
+  font-size: 1.25rem;
+}
+.admin-modal-card h3 {
+  margin: 0 0 8px;
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  color: #421d27;
+}
+.admin-modal-card p {
+  margin: 0 0 22px;
+  color: #6e5759;
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+.admin-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+.admin-modal-actions .button {
+  min-width: 118px;
+  min-height: 40px;
+  padding: 9px 16px;
+}
+.admin-modal-actions .button-outline {
+  border-color: #d8c2c5;
+  background: #ffffff;
+  color: #54373a;
+}
+.admin-modal-actions .button-outline:hover {
+  border-color: #8e1737;
+  background: #fdf6f8;
+  color: #421d27;
+}
+@keyframes admin-modal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (max-width: 640px) {
+  .admin-toast-stack {
+    top: 14px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+  }
+}
+
+
