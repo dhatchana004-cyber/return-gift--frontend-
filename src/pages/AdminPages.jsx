@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import api, { getErrorMessage } from '../services/api';
+import defaultHeroGiftImg from '../assets/boutique-hero-gifts.png';
 
 function useAdminData(path) {
   const [data, setData] = useState(null);
@@ -471,8 +472,9 @@ export function AdminStorefrontSettingsPage() {
   const { data, error, loading, reload, setError } = useAdminData('/admin/storefront-settings');
   const [form, setForm] = useState({
     experience_eyebrow: 'THE BOUTIQUE EXPERIENCE',
-    experience_title: 'vedhika Boutique',
+    experience_title: 'vedhika Return Gift',
     experience_description: '',
+    hero_image_url: '/boutique-hero-gifts.png',
     trending_title: 'Trending Now'
   });
   const [notice, setNotice] = useState('');
@@ -482,8 +484,9 @@ export function AdminStorefrontSettingsPage() {
     if (data?.settings) {
       setForm({
         experience_eyebrow: data.settings.experience_eyebrow || 'THE BOUTIQUE EXPERIENCE',
-        experience_title: data.settings.experience_title || 'vedhika Boutique',
+        experience_title: data.settings.experience_title || 'vedhika Return Gift',
         experience_description: data.settings.experience_description || '',
+        hero_image_url: data.settings.hero_image_url || '/boutique-hero-gifts.png',
         trending_title: data.settings.trending_title || 'Trending Now',
       });
     }
@@ -505,9 +508,9 @@ export function AdminStorefrontSettingsPage() {
     }
   };
 
-  const titleParts = (form.experience_title || 'vedhika Boutique').trim().split(' ');
-  const mainPart = titleParts.length > 1 ? titleParts.slice(0, -1).join(' ') : titleParts[0];
-  const accentPart = titleParts.length > 1 ? titleParts[titleParts.length - 1] : '';
+  const titleParts = (form.experience_title || 'vedhika Return Gift').trim().split(/\s+/);
+  const mainPart = titleParts[0] || '';
+  const accentPart = titleParts.slice(1).join(' ');
 
   return (
     <>
@@ -545,9 +548,9 @@ export function AdminStorefrontSettingsPage() {
                 maxLength={180}
                 value={form.experience_title}
                 onChange={(e) => setForm({ ...form, experience_title: e.target.value })}
-                placeholder="e.g. vedhika Boutique"
+                placeholder="e.g. vedhika Return Gift"
               />
-              <span className="optional">The last word will be rendered in elegant italic serif script.</span>
+              <span className="optional">The words after the first word will be rendered in elegant italic serif script.</span>
             </label>
 
             <label className="admin-form-span">
@@ -560,6 +563,17 @@ export function AdminStorefrontSettingsPage() {
                 onChange={(e) => setForm({ ...form, experience_description: e.target.value })}
                 placeholder="Describe your boutique sanctuary..."
               />
+            </label>
+
+            <label className="admin-form-span">
+              Hero Right-Side Return Gift Image URL
+              <input
+                maxLength={1000}
+                value={form.hero_image_url}
+                onChange={(e) => setForm({ ...form, hero_image_url: e.target.value })}
+                placeholder="/boutique-hero-gifts.png or https://..."
+              />
+              <span className="optional">Leave as <code>/boutique-hero-gifts.png</code> for default curated return-gift photo, or paste any image URL.</span>
             </label>
 
             <label className="admin-form-span">
@@ -593,9 +607,20 @@ export function AdminStorefrontSettingsPage() {
               <span className="brand-serif">{mainPart}</span>{' '}
               {accentPart && <span className="brand-script">{accentPart}</span>}
             </div>
-            <p className="boutique-hero-description" style={{ fontSize: '0.88rem' }}>
-              {form.experience_description || 'Step into our sanctuary of timeless Indian fashion...'}
+            <p className="boutique-hero-description" style={{ fontSize: '0.88rem', marginBottom: 16 }}>
+              {form.experience_description || 'Step into our sanctuary of thoughtful gifting and timeless South Indian craft...'}
             </p>
+            <div className="boutique-hero-frame" style={{ maxWidth: 320 }}>
+              <img
+                src={!form.hero_image_url || form.hero_image_url === '/boutique-hero-gifts.png' ? defaultHeroGiftImg : form.hero_image_url}
+                onError={(e) => {
+                  if (e.currentTarget.src !== defaultHeroGiftImg) {
+                    e.currentTarget.src = defaultHeroGiftImg;
+                  }
+                }}
+                alt="Hero preview"
+              />
+            </div>
           </div>
         </div>
       </div>

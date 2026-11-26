@@ -22,7 +22,8 @@ export function LoginPage() {
   const submit = async (event) => {
     event.preventDefault(); setError(''); setBusy(true);
     try {
-      const data = await login(values);
+      const payload = { email: values.email.trim(), password: values.password.trim() };
+      const data = await login(payload);
       setSignedIn(true);
       if (location.state?.pendingProductId) {
         try {
@@ -33,7 +34,7 @@ export function LoginPage() {
         }
         navigate(location.state.continueTo === '/cart' ? '/cart' : '/checkout');
       } else {
-        const dest = (data?.role === 'admin' || values.email === 'admin@example.com')
+        const dest = data?.role === 'admin'
           ? '/admin'
           : (typeof location.state?.from === 'string' ? location.state.from : location.state?.from?.pathname || '/');
         navigate(dest);
@@ -42,7 +43,7 @@ export function LoginPage() {
     catch (e) { setError(getErrorMessage(e)); }
     finally { setBusy(false); }
   };
-  return <section className="auth-page"><div className="auth-card"><span className="auth-flower">V</span><p className="eyebrow">VEDHIKA BRAND · CLIENT ACCOUNT</p><h1>Welcome back.</h1><p>Sign in to explore your orders and saved collections.</p>{location.state?.notice && <div className="alert alert-success">{location.state.notice}</div>}{error && <div className="alert alert-danger">{error}</div>}{signedIn ? <Link className="button button-gold w-100" to="/products">CONTINUE SHOPPING <i className="bi bi-arrow-right" /></Link> : <form onSubmit={submit} autoComplete="off"><label>Email address<input type="email" name="customer_email_input" autoComplete="off" readOnly={!inputsUnlocked} onFocus={unlockInputs} onPointerDown={unlockInputs} required value={values.email} onChange={(e) => setValues({ ...values, email: e.target.value })} /></label><label>Password<div className="password-input-wrap"><input type={showPassword ? 'text' : 'password'} name="customer_password_input" autoComplete="new-password" readOnly={!inputsUnlocked} onFocus={unlockInputs} onPointerDown={unlockInputs} required value={values.password} onChange={(e) => setValues({ ...values, password: e.target.value })} /><button type="button" className="password-toggle-btn" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'}><i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} /></button></div></label><button className="button button-gold w-100" disabled={busy}>{busy ? 'SIGNING IN…' : 'SIGN IN'} <i className="bi bi-arrow-right" /></button></form>}<p className="auth-switch"><Link to="/forgot-password">Forgot your password?</Link></p><p className="auth-switch">New to VEDHIKA BRAND? <Link to="/register" state={location.state}>Create an account</Link></p></div></section>;
+  return <section className="auth-page"><div className="auth-card"><span className="auth-flower">V</span><p className="eyebrow">VEDHIKA BRAND · CLIENT ACCOUNT</p><h1>Welcome back.</h1><p>Sign in to explore your orders and saved collections.</p>{location.state?.notice && <div className="alert alert-success">{location.state.notice}</div>}{error && <div className="alert alert-danger">{error}</div>}{signedIn ? <Link className="button button-gold w-100" to="/products">CONTINUE SHOPPING <i className="bi bi-arrow-right" /></Link> : <form onSubmit={submit} autoComplete="off"><label>Email address<input type="email" name="customer_email_input" autoComplete="off" readOnly={!inputsUnlocked} onFocus={unlockInputs} onPointerDown={unlockInputs} onPaste={unlockInputs} required value={values.email} onChange={(e) => { unlockInputs(); setValues({ ...values, email: e.target.value }); }} /></label><label>Password<div className="password-input-wrap"><input type={showPassword ? 'text' : 'password'} name="customer_password_input" autoComplete="new-password" readOnly={!inputsUnlocked} onFocus={unlockInputs} onPointerDown={unlockInputs} onPaste={unlockInputs} required value={values.password} onChange={(e) => { unlockInputs(); setValues({ ...values, password: e.target.value }); }} /><button type="button" className="password-toggle-btn" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'}><i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} /></button></div></label><button className="button button-gold w-100" disabled={busy}>{busy ? 'SIGNING IN…' : 'SIGN IN'} <i className="bi bi-arrow-right" /></button></form>}<p className="auth-switch"><Link to="/forgot-password">Forgot your password?</Link></p><p className="auth-switch">New to VEDHIKA BRAND? <Link to="/register" state={location.state}>Create an account</Link></p></div></section>;
 }
 
 const blankRegistrationAddress = {
@@ -141,7 +142,14 @@ export function CheckoutPage() {
     return () => { active = false; };
   }, [user, routeAddress]);
   useEffect(() => {
-    if (!address.district && !address.city && step !== 'payment') {
+    const hasQuoteFields =
+      address.fullName?.trim().length >= 2 &&
+      address.phone?.trim().length >= 7 &&
+      address.addressLine1?.trim().length >= 4 &&
+      address.city?.trim().length >= 2 &&
+      address.state?.trim().length >= 2 &&
+      address.postalCode?.trim().length >= 3;
+    if (!hasQuoteFields || (!address.district && step !== 'payment')) {
       setDeliveryQuote(null);
       setQuoteError('');
       return undefined;
@@ -154,7 +162,7 @@ export function CheckoutPage() {
       .catch((requestError) => { if (active) setQuoteError(getErrorMessage(requestError)); })
       .finally(() => { if (active) setQuoteLoading(false); });
     return () => { active = false; };
-  }, [step, address.district, address.city, address.postalCode, quoteAttempt]);
+  }, [step, address.fullName, address.phone, address.addressLine1, address.district, address.city, address.state, address.postalCode, quoteAttempt]);
   if (!user) return null;
   if (!items.length) return <section className="section empty-collection"><span>&#9825;</span><h2>Your bag is empty.</h2><Link to="/products" className="button button-dark">Browse gifts</Link></section>;
   const saveAddressAndContinue = async () => {

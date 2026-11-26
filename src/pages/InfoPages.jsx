@@ -2,29 +2,33 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import api, { getErrorMessage } from '../services/api';
 import { contactInfo } from '../constants/contact';
+import aboutReturnGiftsImg from '../assets/about-return-gifts.png';
 
 export function AboutPage() {
   return (
     <section className="about-page">
       <div className="about-hero">
-        <p className="eyebrow">THE STORY OF VEDHIKA BRAND</p>
+        <p className="eyebrow">THE STORY OF VEDHIKA RETURN GIFT</p>
         <h1>Rooted in heritage.<br /><em>Made for your moments.</em></h1>
-        <p>Curating the enduring beauty of Indian craftsmanship for life's grandest celebrations.</p>
+        <p>Curating timeless South Indian return gifts and bespoke artisanal favours for life's cherished celebrations.</p>
       </div>
       <div className="about-story">
-        <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1100&q=85" alt="Traditional Indian silk and handloom craftsmanship" />
+        <img
+          src={aboutReturnGiftsImg}
+          alt="Handcrafted South Indian brass kuthu vilakku, thamboolam bags, and bespoke return gift hampers"
+        />
         <div>
           <p className="eyebrow">OUR STORY</p>
-          <h2>Tradition, thoughtfully treasured.</h2>
-          <p>VEDHIKA BRAND is a luxury digital boutique curating authentic handloom Kanchipuram sarees, pure heritage silks, and bespoke return gifts for life's grandest celebrations.</p>
-          <p>We bring the artistry of Indian makers into meaningful moments, pairing considered collections with personal service for every guest, host and occasion.</p>
-          <Link to="/products" className="button button-gold">EXPLORE OUR COLLECTIONS <i className="bi bi-arrow-up-right" /></Link>
+          <h2>Gifting, thoughtfully treasured.</h2>
+          <p>VEDHIKA BRAND is a bespoke return-gift boutique dedicated to curating handcrafted brassware, heritage silk potli favours, festive sweet boxes, and personalized keepsakes for weddings, housewarmings, and milestone celebrations.</p>
+          <p>We bring the warmth of traditional Indian craftsmanship into every guest's hands, pairing considered return-gift collections with custom personalization and personal service for every host, guest, and occasion.</p>
+          <Link to="/return-gifts" className="button button-gold">EXPLORE RETURN GIFTS <i className="bi bi-arrow-up-right" /></Link>
         </div>
       </div>
       <div className="values-grid">
-        <div><span>01</span><h3>Our Craftsmanship</h3><p>We celebrate the skill, patience and detail woven into every heritage textile and artisan-made keepsake.</p></div>
-        <div><span>02</span><h3>Our Collections</h3><p>From Kanchipuram silk to bespoke wedding and corporate gifting, each collection is selected with intention.</p></div>
-        <div><span>03</span><h3>Our Commitment</h3><p>Personal curation, thoughtful presentation and care at every step—from first conversation to delivery.</p></div>
+        <div><span>01</span><h3>Our Craftsmanship</h3><p>We celebrate the skill, patience, and heritage artistry poured into every brass lamp, zari potli pouch, and artisan-made return gift.</p></div>
+        <div><span>02</span><h3>Our Collections</h3><p>From intimate baby showers and birthdays to grand weddings and corporate events, each return-gift collection is curated with intention.</p></div>
+        <div><span>03</span><h3>Our Commitment</h3><p>Custom name tags, ribbon-finished hamper packaging, and timely venue delivery—cared for at every step from first inquiry to doorstep.</p></div>
       </div>
     </section>
   );

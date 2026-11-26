@@ -15,7 +15,7 @@ export default function AdminLoginPage() {
   const unlockInputs = () => { if (!inputsUnlocked) setInputsUnlocked(true); };
   const submit = async (event) => {
     event.preventDefault(); setError(''); setBusy(true);
-    try { await adminLogin(values); navigate('/admin'); }
+    try { await adminLogin({ email: values.email.trim(), password: values.password.trim() }); navigate('/admin'); }
     catch (e) { setError(getErrorMessage(e)); }
     finally { setBusy(false); }
   };
@@ -37,9 +37,10 @@ export default function AdminLoginPage() {
               readOnly={!inputsUnlocked}
               onFocus={unlockInputs}
               onPointerDown={unlockInputs}
+              onPaste={unlockInputs}
               required
               value={values.email}
-              onChange={(e) => setValues({ ...values, email: e.target.value })}
+              onChange={(e) => { unlockInputs(); setValues({ ...values, email: e.target.value }); }}
             />
           </label>
           <label>
@@ -52,9 +53,10 @@ export default function AdminLoginPage() {
                 readOnly={!inputsUnlocked}
                 onFocus={unlockInputs}
                 onPointerDown={unlockInputs}
+                onPaste={unlockInputs}
                 required
                 value={values.password}
-                onChange={(e) => setValues({ ...values, password: e.target.value })}
+                onChange={(e) => { unlockInputs(); setValues({ ...values, password: e.target.value }); }}
               />
               <button type="button" className="password-toggle-btn" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'Hide password' : 'Show password'}>
                 <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />

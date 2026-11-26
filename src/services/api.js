@@ -2,8 +2,15 @@ import axios from 'axios';
 
 const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || 'https://api.vedhikareturngift.com/api' });
 api.interceptors.request.use((config) => {
+  const url = config.url || '';
+  const isPublicAuth =
+    url.includes('/auth/login') ||
+    url.includes('/auth/admin/login') ||
+    url.includes('/auth/register') ||
+    url.includes('/auth/forgot-password') ||
+    url.includes('/auth/reset-password');
   const token = localStorage.getItem('vedhika_token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (token && !isPublicAuth) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 

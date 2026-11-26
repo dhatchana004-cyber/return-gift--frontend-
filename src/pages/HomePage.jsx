@@ -5,12 +5,14 @@ import ProductCard from '../components/ProductCard';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import defaultHeroGiftImg from '../assets/boutique-hero-gifts.png';
 
 const defaultBoutiqueSettings = {
   experience_eyebrow: 'THE BOUTIQUE EXPERIENCE',
-  experience_title: 'vedhika Boutique',
+  experience_title: 'vedhika Return Gift',
   experience_description:
-    'Step into our sanctuary of timeless Indian fashion. From opulent Kanchipuram mulberry silks and hand-embroidered bridal couture to contemporary festive kurtis, every piece at Vedhika Boutique is handpicked to celebrate your grace.',
+    'Step into our sanctuary of thoughtful gifting and timeless South Indian craft. From brass diyas, silk potli keepsakes, and personalized favours to bespoke festive hampers, every return gift at Vedhika is curated to celebrate your guests with grace.',
+  hero_image_url: '',
   trending_title: 'Trending Now',
 };
 
@@ -72,11 +74,11 @@ export default function HomePage() {
     }
   };
 
-  // Title formatting: split "vedhika Boutique" into serif & italic script
-  const titleText = settings.experience_title || 'vedhika Boutique';
-  const parts = titleText.trim().split(' ');
-  const mainPart = parts.length > 1 ? parts.slice(0, -1).join(' ') : parts[0];
-  const accentPart = parts.length > 1 ? parts[parts.length - 1] : '';
+  // Title formatting: split first word ("vedhika") into serif & remaining words ("Return Gift") into italic script
+  const titleText = settings.experience_title || 'vedhika Return Gift';
+  const parts = titleText.trim().split(/\s+/);
+  const mainPart = parts[0] || '';
+  const accentPart = parts.slice(1).join(' ');
 
   // Order categories prioritizing the ones shown in image
   const prioritySlugs = [
@@ -99,21 +101,41 @@ export default function HomePage() {
     return a.name.localeCompare(b.name);
   });
 
+  const heroImgSrc =
+    !settings.hero_image_url || settings.hero_image_url === '/boutique-hero-gifts.png'
+      ? defaultHeroGiftImg
+      : settings.hero_image_url;
+
   return (
     <>
       {/* 1. THE BOUTIQUE EXPERIENCE HERO (Replaces Curated Elegance) */}
       <section className="boutique-experience-hero">
-        <div className="boutique-hero-inner">
-          <span className="boutique-eyebrow">
-            {settings.experience_eyebrow || 'THE BOUTIQUE EXPERIENCE'}
-          </span>
-          <h1 className="boutique-hero-title">
-            <span className="brand-serif">{mainPart}</span>
-            {accentPart && <span className="brand-script">{accentPart}</span>}
-          </h1>
-          <p className="boutique-hero-description">
-            {settings.experience_description}
-          </p>
+        <div className="boutique-hero-grid">
+          <div className="boutique-hero-inner">
+            <span className="boutique-eyebrow">
+              {settings.experience_eyebrow || 'THE BOUTIQUE EXPERIENCE'}
+            </span>
+            <h1 className="boutique-hero-title">
+              <span className="brand-serif">{mainPart}</span>
+              {accentPart && <span className="brand-script">{accentPart}</span>}
+            </h1>
+            <p className="boutique-hero-description">
+              {settings.experience_description}
+            </p>
+          </div>
+          <div className="boutique-hero-visual">
+            <div className="boutique-hero-frame">
+              <img
+                src={heroImgSrc}
+                onError={(e) => {
+                  if (e.currentTarget.src !== defaultHeroGiftImg) {
+                    e.currentTarget.src = defaultHeroGiftImg;
+                  }
+                }}
+                alt="Curated Luxury Return Gifts by Vedhika Boutique"
+              />
+            </div>
+          </div>
         </div>
       </section>
 
