@@ -54,7 +54,15 @@ export default function ProductDetailsPage() {
   const image = activeImage || product.images.find((item) => item.primary) || product.images[0];
   return (
     <section className="section detail-page">
-      <div className="breadcrumbs"><Link to="/">Home</Link><span>/</span><Link to="/products">Collections</Link><span>/</span><span>{product.name}</span></div>
+      <div className="breadcrumbs">
+        <Link to="/">Home</Link>
+        <span>/</span>
+        <Link to={product.category_slug?.includes('return') ? `/return-gifts?category=${product.category_slug}` : '/products'}>
+          {product.category_name || (product.category_slug?.includes('return') ? 'Return Gifts' : 'Collections')}
+        </Link>
+        <span>/</span>
+        <span>{product.name}</span>
+      </div>
       <div className="detail-layout">
         <div className="detail-gallery"><div className="detail-image">{image ? <img src={image.url} alt={image.alt_text || product.name} /> : <div className="product-image-placeholder detail-placeholder"><span>V</span><small>VEDHIKA BRAND</small></div>}</div>{product.images.length > 1 && <div className="detail-thumbnails">{product.images.map((item) => <button key={item.id} className={image?.id === item.id ? 'active' : ''} onClick={() => setActiveImage(item)} aria-label={`View ${item.alt_text || product.name}`}><img src={item.url} alt="" /></button>)}</div>}</div>
         <div className="detail-copy"><p className="eyebrow">{product.category_name || 'VEDHIKA BRAND COLLECTION'}</p><h1>{product.name}</h1><p className="detail-price">{product.offer_percentage > 0 && <span className="detail-offer-badge">{product.offer_percentage}% OFF</span>}<strong>₹{Number(product.final_price ?? product.price).toLocaleString('en-IN')}</strong>{product.offer_percentage > 0 && <del>₹{Number(product.price).toLocaleString('en-IN')}</del>}</p><p className="detail-description">{product.description}</p><p className={`stock-note ${product.stock > 0 ? '' : 'out-of-stock'}`}><span />{product.stock > 0 ? `${product.stock} available` : 'Currently unavailable'}</p>
@@ -65,7 +73,7 @@ export default function ProductDetailsPage() {
           <div className="detail-perks"><span><i className="bi bi-gem" /> Artisan selected</span><span><i className="bi bi-truck" /> Bespoke delivery</span></div>
         </div>
       </div>
-      {related.length > 0 && <div className="related-products"><div className="section-heading"><div><p className="eyebrow">CONTINUE EXPLORING</p><h2>Consider these <em>as well.</em></h2></div><Link className="text-link" to="/products">VIEW COLLECTIONS →</Link></div><div className="product-grid">{related.map((item) => <ProductCard key={item.id} product={item} onAdd={async (selection) => { if (!user) return navigate('/login'); await addItem(selection.id); }} onBuy={async (selection) => { if (!user) return navigate('/login'); await addItem(selection.id); navigate('/checkout'); }} />)}</div></div>}
+      {related.length > 0 && <div className="related-products"><div className="section-heading"><div><p className="eyebrow">CONTINUE EXPLORING</p><h2>Consider these <em>as well.</em></h2></div><Link className="text-link" to={product.category_slug?.includes('return') ? "/return-gifts" : "/products"}>VIEW {product.category_slug?.includes('return') ? "RETURN GIFTS" : "COLLECTIONS"} →</Link></div><div className="product-grid">{related.map((item) => <ProductCard key={item.id} product={item} onAdd={async (selection) => { if (!user) return navigate('/login'); await addItem(selection.id); }} onBuy={async (selection) => { if (!user) return navigate('/login'); await addItem(selection.id); navigate('/checkout'); }} />)}</div></div>}
     </section>
   );
 }

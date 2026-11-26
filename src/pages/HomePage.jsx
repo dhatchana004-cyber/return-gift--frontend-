@@ -78,7 +78,7 @@ export default function HomePage() {
           <p>Thoughtful keepsakes, beautifully chosen for the moments worth celebrating.</p>
         </div>
         <div className="collections-band">
-          {categories.filter((category) => categoriesForNavigation[category.name]).map((category, index) => <Link key={category.id} className={`collection-feature collection-feature-${index + 1}`} to={`/products?category=${category.slug}`}><span className="eyebrow">{category.name.toUpperCase()}</span><strong>{category.name}</strong><span>EXPLORE COLLECTION <i className="bi bi-arrow-up-right" /></span></Link>)}
+          {categories.filter((category) => categoriesForNavigation[category.name]).map((category, index) => <Link key={category.id} className={`collection-feature collection-feature-${index + 1}`} to={`/return-gifts?category=${category.slug}`}><span className="eyebrow">{category.name.toUpperCase()}</span><strong>{category.name}</strong><span>EXPLORE COLLECTION <i className="bi bi-arrow-up-right" /></span></Link>)}
         </div>
       </section>
 

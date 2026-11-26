@@ -14,6 +14,11 @@ const returnGiftSlugs = new Set([
   'customized-return-gifts',
 ]);
 
+const isReturnGiftSlug = (slug) => {
+  if (!slug) return false;
+  return returnGiftSlugs.has(slug) || slug.includes('return-gift') || slug.includes('return');
+};
+
 export default function ReturnGiftsPage() {
   const [params] = useSearchParams();
   const [products, setProducts] = useState([]);
@@ -27,8 +32,8 @@ export default function ReturnGiftsPage() {
   useEffect(() => {
     Promise.all([api.get('/products?limit=100'), api.get('/categories')])
       .then(([productResponse, categoryResponse]) => {
-        setProducts(productResponse.data.products.filter((product) => returnGiftSlugs.has(product.category_slug)));
-        setCategories(categoryResponse.data.categories.filter((category) => returnGiftSlugs.has(category.slug)));
+        setProducts(productResponse.data.products.filter((product) => isReturnGiftSlug(product.category_slug)));
+        setCategories(categoryResponse.data.categories.filter((category) => isReturnGiftSlug(category.slug)));
         setError('');
       })
       .catch((requestError) => setError(getErrorMessage(requestError)));

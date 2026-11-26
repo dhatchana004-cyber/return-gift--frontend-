@@ -17,9 +17,9 @@
   --serif: 'Playfair Display', Georgia, serif;
 }
 
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { margin: 0; min-width: 320px; background: var(--black); color: var(--white); }
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; max-width: 100%; overflow-x: hidden; }
+body { margin: 0; min-width: 0; width: 100%; max-width: 100%; overflow-x: hidden; background: var(--black); color: var(--white); }
 a { color: inherit; text-decoration: none; }
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
@@ -282,17 +282,24 @@ textarea { min-height: 90px; resize: vertical; }
 .order-cancel-policy { margin: -16px 0 24px; color: #806b6c; font-size: .75rem; }
 .order-cancel-button { display: flex; width: fit-content; min-height: 32px; padding: 6px 12px; margin: 14px 0 0 auto; font-size: .54rem; letter-spacing: .06em; }
 
-.auth-page { min-height: 68vh; display: grid; place-items: center; padding: 65px 20px; background: radial-gradient(ellipse at 50% 20%, #191609, #000 65%); }
-.auth-card { width: min(440px, 100%); padding: 36px; border: 1px solid #d9ad0060; background: #090909; }
+.auth-page { min-height: 68vh; display: grid; place-items: center; padding: clamp(24px, 5vw, 65px) clamp(10px, 3vw, 20px); width: 100%; max-width: 100%; box-sizing: border-box; overflow-x: hidden; background: radial-gradient(ellipse at 50% 20%, #191609, #000 65%); }
+.auth-card { width: min(440px, 100%); padding: clamp(18px, 4.5vw, 36px); border: 1px solid #d9ad0060; background: #090909; box-sizing: border-box; overflow: hidden; word-wrap: break-word; }
 .auth-card.register-card { width: min(680px, 100%); }
 .auth-flower { display: grid; width: 44px; height: 44px; place-items: center; margin-bottom: 20px; border: 1px solid var(--gold); border-radius: 50%; color: var(--gold); font: italic 1.6rem var(--serif); }
-.auth-card h1 { margin: 0 0 10px; font-size: 2.5rem; }
-.auth-card > p:not(.eyebrow):not(.auth-switch) { color: #999; font-size: .78rem; line-height: 1.7; }
-.auth-card form { display: grid; gap: 16px; margin-top: 22px; }
+.auth-card h1 { margin: 0 0 10px; font-size: clamp(1.6rem, 5.5vw, 2.5rem); line-height: 1.15; word-break: break-word; }
+.auth-card .eyebrow { letter-spacing: clamp(0.08em, 1.2vw, 0.19em); font-size: clamp(0.55rem, 1.8vw, 0.65rem); word-break: break-word; white-space: normal; }
+.auth-card > p:not(.eyebrow):not(.auth-switch) { color: #999; font-size: .78rem; line-height: 1.7; word-break: break-word; }
+.auth-card form { display: grid; gap: 16px; margin-top: 22px; width: 100%; max-width: 100%; box-sizing: border-box; }
+.auth-card form label { display: flex; flex-direction: column; width: 100%; max-width: 100%; box-sizing: border-box; font-size: .74rem; }
+.auth-card form input { width: 100%; max-width: 100%; box-sizing: border-box; min-width: 0; }
+.password-input-wrap { position: relative; display: flex; align-items: center; width: 100%; }
+.password-input-wrap input { width: 100%; padding-right: 44px !important; }
+.password-toggle-btn { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: transparent; border: none; padding: 6px 8px; color: #888; font-size: 1.15rem; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; transition: color .2s; }
+.password-toggle-btn:hover { color: var(--gold, #8e1737); }
 .register-card form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .register-form-span, .register-address-heading { grid-column: 1 / -1; }
 .register-address-heading { margin: 8px 0 -4px; padding-top: 14px; border-top: 1px solid #ead8d5; font: 1.2rem var(--serif); }
-.auth-switch { margin: 17px 0 0; color: #aaa; font-size: .72rem; text-align: center; }
+.auth-switch { margin: 17px 0 0; color: #aaa; font-size: .72rem; text-align: center; word-break: break-word; }
 .auth-switch a { color: var(--gold-light); }
 .admin-login-page { min-height: 100vh; }
 .alert { padding: 11px 14px; margin: 12px 0; border: 1px solid; font-size: .75rem; }
@@ -522,7 +529,11 @@ textarea { min-height: 90px; resize: vertical; }
   .cart-item-info > a { font-size: .95rem; }
   .detail-actions { align-items: stretch; }
   .detail-actions .button { flex: 1; padding-inline: 10px; font-size: .56rem; }
-  .auth-card { padding: 26px 21px; }
+  .auth-page { padding: 20px 10px; width: 100%; box-sizing: border-box; }
+  .auth-card { padding: 20px 14px; width: 100%; box-sizing: border-box; }
+  .auth-card h1 { font-size: 1.75rem; }
+  .auth-flower { width: 38px; height: 38px; font-size: 1.35rem; margin-bottom: 14px; }
+  .alert { padding: 8px 10px; font-size: .72rem; word-break: break-word; }
   .register-card form { grid-template-columns: 1fr; }
   .register-form-span, .register-address-heading { grid-column: auto; }
   .footer-main { grid-template-columns: 1fr; }
@@ -536,6 +547,19 @@ textarea { min-height: 90px; resize: vertical; }
   .download-grid { grid-template-columns: 1fr; }
   .message-card > div { flex-direction: column; }
   .quotation-status { align-items: flex-start; }
+}
+
+@media (max-width: 320px) {
+  .site-header { padding-inline: 8px; min-height: 56px; }
+  .brand { font-size: .62rem; gap: 5px; }
+  .brand-mark { width: 26px; height: 26px; font-size: .85rem; }
+  .header-actions { gap: 4px; }
+  .header-actions > a, .header-actions > button { font-size: .75rem; }
+  .auth-page { padding: 14px 6px; }
+  .auth-card { padding: 16px 10px; }
+  .auth-card h1 { font-size: 1.4rem; }
+  .auth-card form input { font-size: .72rem; padding: 7px 8px; min-height: 36px; }
+  .auth-card .eyebrow { font-size: .52rem; letter-spacing: .05em; }
 }
 
 /* Warm boutique palette inspired by the supplied return-gift design. */

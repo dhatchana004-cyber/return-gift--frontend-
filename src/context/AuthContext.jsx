@@ -14,12 +14,13 @@ export function AuthProvider({ children }) {
   const saveSession = (data, role) => {
     localStorage.setItem('vedhika_token', data.token);
     if (data.refresh) localStorage.setItem('vedhika_refresh', data.refresh);
-    if (role === 'admin') {
+    const resolvedRole = data.role || role;
+    if (resolvedRole === 'admin') {
       localStorage.setItem('vedhika_role', 'admin');
       localStorage.setItem('vedhika_admin', JSON.stringify(data.user));
-      localStorage.removeItem('vedhika_user');
+      localStorage.setItem('vedhika_user', JSON.stringify(data.user));
       setAdmin(data.user);
-      setUser(null);
+      setUser(data.user);
     } else {
       localStorage.setItem('vedhika_role', 'customer');
       localStorage.setItem('vedhika_user', JSON.stringify(data.user));
@@ -30,8 +31,16 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (values) => saveSession((await api.post('/auth/register', values)).data, 'customer');
-  const login = async (values) => saveSession((await api.post('/auth/login', values)).data, 'customer');
-  const adminLogin = async (values) => saveSession((await api.post('/auth/admin/login', values)).data, 'admin');
+  const login = async (values) => {
+    const res = await api.post('/auth/login', values);
+    saveSession(res.data, res.data.role || 'customer');
+    return res.data;
+  };
+  const adminLogin = async (values) => {
+    const res = await api.post('/auth/admin/login', values);
+    saveSession(res.data, 'admin');
+    return res.data;
+  };
   const updateUser = (nextUser) => {
     localStorage.setItem('vedhika_user', JSON.stringify(nextUser));
     setUser(nextUser);

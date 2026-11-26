@@ -120,7 +120,7 @@ export function AdminOrdersPage() {
     try { await api.patch(`/admin/orders/${id}/status`, { status }); setNotice(`Order #${id} updated.`); await reload(); }
     catch (e) { setError(getErrorMessage(e)); }
   };
-  return <><div className="admin-page-heading"><div><p className="eyebrow">FROM CHECKOUT TO THEIR DOOR</p><h1>Orders</h1></div><span>{data?.orders.length || 0} orders</span></div><AdminFeedback error={error} notice={notice} /><div className="admin-section-card">{loading ? <p className="loading-copy">Loading orders...</p> : data?.orders.length ? <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Order</th><th>Customer</th><th>Placed</th><th>Total</th><th>Payment</th><th>Status</th><th>Details</th></tr></thead><tbody>{data.orders.map((order) => <tr key={order.id}><td>#{order.id}</td><td>{order.customer_name}<small>{order.customer_email}<br />{order.customer_phone}</small></td><td>{new Date(order.created_at).toLocaleDateString('en-IN')}</td><td>₹{Number(order.subtotal).toLocaleString('en-IN')}</td><td>{order.payment_method === 'cash_on_delivery' ? 'Cash on delivery' : order.payment_method}<small>{order.payment_status}</small></td><td><select className="status-select" value={order.status} onChange={(e) => updateStatus(order.id, e.target.value)}>{['pending','confirmed','processing','shipped','delivered','cancelled'].map((status) => <option key={status} value={status}>{status}</option>)}</select></td><td><button className="text-button" onClick={() => setExpanded(expanded === order.id ? null : order.id)}>{expanded === order.id ? 'Hide' : 'View'}</button>{expanded === order.id && <div className="order-detail-pop"><strong>Deliver to</strong><p>{order.shipping_address.fullName}<br />{order.shipping_address.addressLine1}<br />{order.shipping_address.addressLine2}<br />{order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.postalCode}<br />{order.shipping_address.country}<br />{order.shipping_address.phone}</p><strong>Items</strong>{order.items.map((item, index) => <p key={index}>{item.name} × {item.quantity}{item.printedName && ` · ${item.printedName}`}{item.giftMessage && ` · “${item.giftMessage}”`}</p>)}{order.notes && <p><strong>Note:</strong> {order.notes}</p>}</div>}</td></tr>)}</tbody></table></div> : <div className="admin-empty">Your orders will appear here.</div>}</div></>;
+  return <><div className="admin-page-heading"><div><p className="eyebrow">FROM CHECKOUT TO THEIR DOOR</p><h1>Orders</h1></div><span>{data?.orders.length || 0} orders</span></div><AdminFeedback error={error} notice={notice} /><div className="admin-section-card">{loading ? <p className="loading-copy">Loading orders...</p> : data?.orders.length ? <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Order</th><th>Customer</th><th>Placed</th><th>Total</th><th>Payment</th><th>Status</th><th>Details</th></tr></thead><tbody>{data.orders.map((order) => <tr key={order.id}><td>#{order.id}</td><td>{order.customer_name}<small>{order.customer_email}<br />{order.customer_phone}</small></td><td>{new Date(order.created_at).toLocaleDateString('en-IN')}</td><td>₹{Number(order.total || order.subtotal).toLocaleString('en-IN')}</td><td>{order.payment_method === 'cash_on_delivery' ? 'Cash on delivery' : order.payment_method === 'razorpay' ? 'Razorpay' : order.payment_method}<small>{order.payment_status}</small></td><td><select className="status-select" value={order.status} onChange={(e) => updateStatus(order.id, e.target.value)}>{['pending','confirmed','processing','shipped','delivered','cancelled'].map((status) => <option key={status} value={status}>{status}</option>)}</select></td><td><button className="text-button" onClick={() => setExpanded(expanded === order.id ? null : order.id)}>{expanded === order.id ? 'Hide' : 'View'}</button>{expanded === order.id && <div className="order-detail-pop"><strong>Deliver to</strong><p>{order.shipping_address.fullName}<br />{order.shipping_address.addressLine1}<br />{order.shipping_address.addressLine2}<br />{order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.postalCode}<br />{order.shipping_address.country}<br />{order.shipping_address.phone}</p><strong>Items</strong>{order.items.map((item, index) => <p key={index}>{item.name} × {item.quantity}{item.printedName && ` · ${item.printedName}`}{item.giftMessage && ` · “${item.giftMessage}”`}</p>)}{order.notes && <p><strong>Note:</strong> {order.notes}</p>}</div>}</td></tr>)}</tbody></table></div> : <div className="admin-empty">Your orders will appear here.</div>}</div></>;
 }
 
 export function AdminCustomersPage() {
@@ -177,37 +177,203 @@ export function AdminCategoriesPage() {
 
 export function AdminDeliveryChargeSettingsPage() {
   const { data, error, loading, reload, setError } = useAdminData('/admin/delivery-charge-settings');
-  const [enabled, setEnabled] = useState(false);
-  const [ratePerKm, setRatePerKm] = useState('1.00');
+  const [enabled, setEnabled] = useState(true);
+  const [defaultCharge, setDefaultCharge] = useState('50.00');
+  const [districts, setDistricts] = useState([]);
+  const [search, setSearch] = useState('');
+  const [flatRateInput, setFlatRateInput] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!data) return;
-    setEnabled(data.enabled);
-    setRatePerKm(data.rate_per_km);
+    setEnabled(data.enabled !== false);
+    setDefaultCharge(data.default_charge || '50.00');
+    if (data.districts) setDistricts(data.districts);
   }, [data]);
+
+  const updateDistrictCharge = (id, newCharge) => {
+    setDistricts((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, charge: newCharge } : d))
+    );
+  };
+
+  const toggleDistrictActive = (id) => {
+    setDistricts((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, is_active: !d.is_active } : d))
+    );
+  };
+
+  const applyFlatRate = (e) => {
+    e.preventDefault();
+    const rate = parseFloat(flatRateInput);
+    if (isNaN(rate) || rate < 0) {
+      setError('Please enter a valid amount (e.g. 50 or 60).');
+      return;
+    }
+    setDistricts((prev) => prev.map((d) => ({ ...d, charge: rate.toFixed(2) })));
+    setNotice(`Updated all 38 districts to ₹${rate.toFixed(2)}. Click "Save All Settings" to confirm.`);
+  };
 
   const save = async (event) => {
     event.preventDefault();
     setBusy(true); setError(''); setNotice('');
     try {
-      await api.put('/admin/delivery-charge-settings', { enabled, rate_per_km: ratePerKm });
-      setNotice('Delivery charge settings saved.');
+      await api.put('/admin/delivery-charge-settings', {
+        enabled,
+        default_charge: defaultCharge,
+        district_charges: districts,
+      });
+      setNotice('Tamil Nadu district delivery charges saved successfully!');
       await reload();
-    } catch (requestError) { setError(getErrorMessage(requestError)); }
-    finally { setBusy(false); }
+    } catch (requestError) {
+      setError(getErrorMessage(requestError));
+    } finally {
+      setBusy(false);
+    }
   };
 
-  return <><div className="admin-page-heading"><div><p className="eyebrow">CHECKOUT CONFIGURATION</p><h1>Delivery Charge Settings</h1></div></div><AdminFeedback error={error} notice={notice} />
-    {loading ? <p className="loading-copy">Loading delivery settings...</p> : <form className="admin-form-card" onSubmit={save}>
-      <p className="admin-help-copy">Distance provider: {data?.distance_provider || 'Checking availability…'}. Delivery addresses are used only to calculate a driving route.</p>
-      <label className="admin-check"><input type="checkbox" checked={enabled} onChange={(event) => setEnabled(event.target.checked)} /> Enable distance-based COD charges</label>
-      <label>Delivery charge per kilometre (₹)<input required type="number" min="0" max="999999.99" step="0.01" value={ratePerKm} onChange={(event) => setRatePerKm(event.target.value)} /></label>
-      <p className="admin-help-copy">Example: at ₹{Number(ratePerKm || 0).toFixed(2)} per KM, a 15 KM delivery adds ₹{(15 * Number(ratePerKm || 0)).toFixed(2)} to the COD order.</p>
-      <button className="button button-dark" disabled={busy}>{busy ? 'Saving settings...' : 'Save Settings'}</button>
-    </form>}
-  </>;
+  const filteredDistricts = districts.filter((d) =>
+    d.name.toLowerCase().includes(search.trim().toLowerCase())
+  );
+
+  return (
+    <>
+      <div className="admin-page-heading">
+        <div>
+          <p className="eyebrow">TAMIL NADU DELIVERY CONFIGURATION</p>
+          <h1>Delivery Charge Settings</h1>
+        </div>
+      </div>
+      <AdminFeedback error={error} notice={notice} />
+
+      {loading ? (
+        <p className="loading-copy">Loading delivery settings...</p>
+      ) : (
+        <form className="admin-form-card" onSubmit={save} style={{ maxWidth: 900 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, alignItems: 'center', marginBottom: 18 }}>
+            <label className="admin-check" style={{ margin: 0 }}>
+              <input
+                type="checkbox"
+                checked={enabled}
+                onChange={(event) => setEnabled(event.target.checked)}
+              />
+              <strong>Enable Delivery Charges</strong>
+            </label>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+              <span>Fallback / Other State Delivery Charge: ₹</span>
+              <input
+                required
+                type="number"
+                min="0"
+                step="0.01"
+                value={defaultCharge}
+                onChange={(e) => setDefaultCharge(e.target.value)}
+                style={{ width: 100, minHeight: 36, padding: '4px 8px' }}
+              />
+            </label>
+          </div>
+
+          <div style={{ borderTop: '1px solid #dfcbc7', paddingTop: 18, marginTop: 14 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+              <div>
+                <h2 style={{ margin: 0, fontSize: '1.25rem' }}>Tamil Nadu Districts ({districts.length} Districts)</h2>
+                <p style={{ margin: '3px 0 0', color: '#806b6c', fontSize: '.75rem' }}>
+                  Admin-configured delivery charge per district. Customers will automatically be charged this rate based on their delivery district.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Set All ₹"
+                  value={flatRateInput}
+                  onChange={(e) => setFlatRateInput(e.target.value)}
+                  style={{ width: 110, minHeight: 36, padding: '4px 8px' }}
+                />
+                <button
+                  type="button"
+                  className="button button-outline"
+                  onClick={applyFlatRate}
+                  style={{ minHeight: 36, padding: '6px 12px', fontSize: '.7rem' }}
+                >
+                  Apply to All
+                </button>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 12 }}>
+              <input
+                type="text"
+                placeholder="🔍 Search district (e.g. Chennai, Madurai, Coimbatore, Dindigul...)"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ maxWidth: 380, minHeight: 36 }}
+              />
+            </div>
+
+            <div style={{ maxHeight: 440, overflowY: 'auto', border: '1px solid #dfcbc7', background: '#fff' }}>
+              <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead style={{ position: 'sticky', top: 0, background: '#f5ece9', zIndex: 2 }}>
+                  <tr>
+                    <th style={{ textAlign: 'left', padding: '9px 12px', width: 40 }}>#</th>
+                    <th style={{ textAlign: 'left', padding: '9px 12px' }}>District</th>
+                    <th style={{ textAlign: 'left', padding: '9px 12px', width: 180 }}>Delivery Charge (₹)</th>
+                    <th style={{ textAlign: 'center', padding: '9px 12px', width: 70 }}>Active</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredDistricts.map((d, index) => (
+                    <tr key={d.id} style={{ borderBottom: '1px solid #f0e6e4' }}>
+                      <td style={{ padding: '8px 12px', color: '#888' }}>{index + 1}</td>
+                      <td style={{ padding: '8px 12px', fontWeight: 600 }}>{d.name}</td>
+                      <td style={{ padding: '8px 12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span>₹</span>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={d.charge}
+                            onChange={(e) => updateDistrictCharge(d.id, e.target.value)}
+                            style={{ width: 110, minHeight: 34, padding: '4px 8px' }}
+                          />
+                        </div>
+                      </td>
+                      <td style={{ padding: '8px 12px', textAlign: 'center' }}>
+                        <input
+                          type="checkbox"
+                          checked={d.is_active}
+                          onChange={() => toggleDistrictActive(d.id)}
+                          style={{ width: 18, height: 18, cursor: 'pointer' }}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                  {filteredDistricts.length === 0 && (
+                    <tr>
+                      <td colSpan={4} style={{ textAlign: 'center', padding: 24, color: '#888' }}>
+                        No districts match "{search}".
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 20 }}>
+            <button className="button button-gold" disabled={busy} style={{ minWidth: 200 }}>
+              {busy ? 'Saving settings...' : 'Save All Settings'}
+            </button>
+          </div>
+        </form>
+      )}
+    </>
+  );
 }
 
 export function AdminReportsPage() {
