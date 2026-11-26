@@ -78,6 +78,21 @@ export default function ReturnGiftsPage() {
           <div>
             <p className="eyebrow">THE RETURN GIFT COLLECTION</p>
             <h2>{selected?.name || 'Give thanks, beautifully.'}</h2>
+            {selected && (Number(selected.price) > 0 || selected.offer_percentage > 0) && (
+              <div className="category-heading-offer">
+                {Number(selected.price) > 0 && (
+                  <span className="product-price">
+                    <strong>₹{Number(selected.final_price ?? selected.price).toLocaleString('en-IN')}</strong>
+                    {selected.offer_percentage > 0 && (
+                      <del>₹{Number(selected.price).toLocaleString('en-IN')}</del>
+                    )}
+                  </span>
+                )}
+                {selected.offer_percentage > 0 && (
+                  <span className="category-heading-offer-badge">{selected.offer_percentage}% OFF</span>
+                )}
+              </div>
+            )}
           </div>
           <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
             {selectedSlug && (

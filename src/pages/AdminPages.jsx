@@ -152,8 +152,20 @@ export function AdminOrdersPage() {
 }
 
 export function AdminCustomersPage() {
-  const { data, error, loading } = useAdminData('/admin/customers');
-  return <><div className="admin-page-heading"><div><p className="eyebrow">THE PEOPLE BEHIND THE PARTIES</p><h1>Customers</h1></div><span>{data?.customers.length || 0} lovely people</span></div><AdminFeedback error={error} />{loading ? <p className="loading-copy">Loading customers...</p> : <div className="admin-section-card"><div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Customer</th><th>Phone</th><th>Joined</th><th>Orders</th><th>Total spent</th></tr></thead><tbody>{data?.customers.map((customer) => <tr key={customer.id}><td>{customer.name}<small>{customer.email}</small></td><td>{customer.phone || '—'}</td><td>{new Date(customer.created_at).toLocaleDateString('en-IN')}</td><td>{customer.order_count}</td><td>₹{Number(customer.total_spent).toLocaleString('en-IN')}</td></tr>)}</tbody></table></div></div>}</>;
+  const { data, error, loading, reload, setError } = useAdminData('/admin/customers');
+  const [notice, setNotice] = useState('');
+  const [deletingId, setDeletingId] = useState(null);
+  const removeCustomer = async (customer) => {
+    if (!window.confirm(`Delete customer "${customer.name}" (${customer.email})? This cannot be undone.`)) return;
+    setDeletingId(customer.id); setError(''); setNotice('');
+    try {
+      await api.delete(`/admin/customers/${customer.id}`);
+      setNotice(`Customer "${customer.name}" deleted.`);
+      await reload();
+    } catch (e) { setError(getErrorMessage(e)); }
+    finally { setDeletingId(null); }
+  };
+  return <><div className="admin-page-heading"><div><p className="eyebrow">THE PEOPLE BEHIND THE PARTIES</p><h1>Customers</h1></div><span>{data?.customers.length || 0} lovely people</span></div><AdminFeedback error={error} notice={notice} />{loading ? <p className="loading-copy">Loading customers...</p> : data?.customers.length ? <div className="admin-section-card"><div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Customer</th><th>Phone</th><th>Joined</th><th>Orders</th><th>Total spent</th><th>Actions</th></tr></thead><tbody>{data.customers.map((customer) => <tr key={customer.id}><td>{customer.name}<small>{customer.email}</small></td><td>{customer.phone || '—'}</td><td>{new Date(customer.created_at).toLocaleDateString('en-IN')}</td><td>{customer.order_count}</td><td>₹{Number(customer.total_spent).toLocaleString('en-IN')}</td><td className="table-actions"><button type="button" className="danger-link" disabled={deletingId === customer.id} onClick={() => removeCustomer(customer)}>{deletingId === customer.id ? 'Deleting…' : 'Delete'}</button></td></tr>)}</tbody></table></div></div> : <div className="admin-section-card admin-empty">No customers yet.</div>}</>;
 }
 
 export function AdminMessagesPage() {
@@ -180,7 +192,7 @@ export function AdminQuotationsPage() {
 
 export function AdminCategoriesPage() {
   const { data, error, loading, reload, setError } = useAdminData('/admin/categories');
-  const [form, setForm] = useState({ name: '', description: '', is_trending: false });
+  const [form, setForm] = useState({ name: '', description: '', price: '', offer_percentage: '0', is_trending: false });
   const [imageFile, setImageFile] = useState(null);
   const [uploadingId, setUploadingId] = useState(null);
   const [togglingId, setTogglingId] = useState(null);
@@ -195,10 +207,12 @@ export function AdminCategoriesPage() {
       const payload = new FormData();
       payload.append('name', form.name.trim());
       payload.append('description', form.description.trim());
+      payload.append('price', form.price !== '' ? String(Number(form.price)) : '0');
+      payload.append('offer_percentage', form.offer_percentage !== '' ? String(Number(form.offer_percentage)) : '0');
       payload.append('is_trending', form.is_trending ? 'true' : 'false');
       if (imageFile) payload.append('image', imageFile);
       await api.post('/admin/categories', payload);
-      setForm({ name: '', description: '', is_trending: false });
+      setForm({ name: '', description: '', price: '', offer_percentage: '0', is_trending: false });
       setImageFile(null);
       if (createFileRef.current) createFileRef.current.value = '';
       setNotice('Category added.');
@@ -233,7 +247,10 @@ export function AdminCategoriesPage() {
   const save = async (id) => {
     setError(''); setNotice('');
     try {
-      await api.patch(`/admin/categories/${id}`, editing[id] || {});
+      const patch = { ...(editing[id] || {}) };
+      if (patch.price !== undefined) patch.price = patch.price !== '' ? Number(patch.price) : 0;
+      if (patch.offer_percentage !== undefined) patch.offer_percentage = patch.offer_percentage !== '' ? Number(patch.offer_percentage) : 0;
+      await api.patch(`/admin/categories/${id}`, patch);
       setNotice('Category updated.');
       await reload();
     } catch (e) { setError(getErrorMessage(e)); }
@@ -250,7 +267,9 @@ export function AdminCategoriesPage() {
       <h3>Add a category</h3>
       <div className="category-form-row">
         <label>Category name<input required minLength="2" maxLength="100" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Return Gifts" /></label>
-        <label>Upload image <span className="optional">(JPG/PNG/WEBP, max 5 MB)</span><input ref={createFileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => setImageFile(e.target.files?.[0] || null)} /></label>
+        <label>Amount (₹)<input type="number" min="0" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="e.g. 499" /></label>
+        <label>Offer (%)<input type="number" min="0" max="100" step="1" value={form.offer_percentage} onChange={(e) => setForm({ ...form, offer_percentage: e.target.value })} placeholder="0" /></label>
+        <label>Upload image <span className="optional">(max 5 MB)</span><input ref={createFileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => setImageFile(e.target.files?.[0] || null)} /></label>
         <label>Description<input maxLength="1000" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Brief description" /></label>
         <button className="button button-dark" disabled={busy}>{busy ? 'Adding...' : 'Add category'}</button>
       </div>
@@ -271,6 +290,8 @@ export function AdminCategoriesPage() {
             )}
           </div>
           <label>Name<input value={editing[category.id]?.name ?? category.name} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], name: e.target.value } })} /></label>
+          <label className="category-admin-price-field">Amount (₹)<input type="number" min="0" step="0.01" value={editing[category.id]?.price ?? category.price ?? '0'} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], price: e.target.value } })} /></label>
+          <label className="category-admin-offer-field">Offer (%)<input type="number" min="0" max="100" step="1" value={editing[category.id]?.offer_percentage ?? category.offer_percentage ?? '0'} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], offer_percentage: e.target.value } })} /></label>
           <label>Description<input value={editing[category.id]?.description ?? category.description ?? ''} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], description: e.target.value } })} /></label>
           <label className="category-upload-btn" title="Upload new category image">
             <i className="bi bi-cloud-arrow-up" /> {uploadingId === category.id ? 'Uploading…' : 'Upload Image'}

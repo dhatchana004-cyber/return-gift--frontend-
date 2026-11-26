@@ -178,11 +178,22 @@ export default function HomePage() {
                         </div>
                       )}
                       <span className="product-tag">TRENDING NOW</span>
+                      {category.offer_percentage > 0 && (
+                        <span className="product-offer-badge">{category.offer_percentage}% OFF</span>
+                      )}
                     </div>
                     <div className="trending-category-body">
                       <span className="eyebrow">COLLECTION</span>
                       <h3>{category.name}</h3>
                       {category.description && <p>{category.description}</p>}
+                      {Number(category.price) > 0 && (
+                        <div className="product-price trending-category-price">
+                          <strong>₹{Number(category.final_price ?? category.price).toLocaleString('en-IN')}</strong>
+                          {category.offer_percentage > 0 && (
+                            <del>₹{Number(category.price).toLocaleString('en-IN')}</del>
+                          )}
+                        </div>
+                      )}
                       <span className="trending-category-cta">
                         EXPLORE COLLECTION <i className="bi bi-arrow-right" />
                       </span>
@@ -222,16 +233,29 @@ export default function HomePage() {
               to={`/return-gifts?category=${category.slug}`}
               className="category-circle-card"
             >
-              <div className="category-circle-thumb">
-                {category.image_url ? (
-                  <img src={category.image_url} alt={category.name} loading="lazy" />
-                ) : (
-                  <span className="category-circle-fallback">
-                    {category.name.charAt(0)}
-                  </span>
+              <div className="category-circle-thumb-wrap">
+                {category.offer_percentage > 0 && (
+                  <span className="category-offer-badge">{category.offer_percentage}% OFF</span>
                 )}
+                <div className="category-circle-thumb">
+                  {category.image_url ? (
+                    <img src={category.image_url} alt={category.name} loading="lazy" />
+                  ) : (
+                    <span className="category-circle-fallback">
+                      {category.name.charAt(0)}
+                    </span>
+                  )}
+                </div>
               </div>
               <span className="category-circle-label">{category.name}</span>
+              {Number(category.price) > 0 && (
+                <div className="category-circle-price">
+                  <strong>₹{Number(category.final_price ?? category.price).toLocaleString('en-IN')}</strong>
+                  {category.offer_percentage > 0 && (
+                    <del>₹{Number(category.price).toLocaleString('en-IN')}</del>
+                  )}
+                </div>
+              )}
             </Link>
           ))}
         </div>
