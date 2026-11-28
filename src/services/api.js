@@ -38,6 +38,23 @@ api.interceptors.response.use(undefined, async (error) => {
   }
 });
 
+const API_ORIGIN = (import.meta.env.VITE_API_ORIGIN || 'https://api.vedhikareturngift.com').replace(/\/$/, '');
+
+export function resolveMediaUrl(url) {
+  if (!url) return '';
+  const value = String(url).trim();
+  if (!value) return '';
+  if (value.startsWith('/')) return `${API_ORIGIN}${value}`;
+  if (!import.meta.env.DEV) {
+    const localProxyMatch = value.match(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?(\/media\/.*)$/i);
+    if (localProxyMatch) return `${API_ORIGIN}${localProxyMatch[1]}`;
+  }
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:' && value.startsWith('http://api.vedhikareturngift.com/')) {
+    return value.replace(/^http:\/\//i, 'https://');
+  }
+  return value;
+}
+
 export function getErrorMessage(error) {
   const response = error.response?.data;
   if (

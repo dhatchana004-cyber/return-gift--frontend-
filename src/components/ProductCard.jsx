@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
+import { resolveMediaUrl } from '../services/api';
 
 export default function ProductCard({ product, onAdd, onBuy, showDetailsButton = false }) {
   const { user } = useAuth();
@@ -34,7 +35,7 @@ export default function ProductCard({ product, onAdd, onBuy, showDetailsButton =
     onAdd(product);
   };
   const image = product.image_url || product.images?.[0]?.url;
-  const imageUrl = image && (image.startsWith('http') ? image : `${import.meta.env.VITE_API_ORIGIN || ''}${image}`);
+  const imageUrl = resolveMediaUrl(image);
   return (
     <article className="product-card">
       <Link to={`/products/${product.slug}`} className="product-image-wrap">

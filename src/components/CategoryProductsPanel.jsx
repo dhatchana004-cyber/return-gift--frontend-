@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import api, { getErrorMessage } from '../services/api';
+import api, { getErrorMessage, resolveMediaUrl } from '../services/api';
 import { useAdminFeedback } from './AdminDialogs';
 
 const emptyCategoryProduct = {
@@ -233,7 +233,7 @@ export default function CategoryProductsPanel({ category, products, onClose, onC
               <div className="admin-image-list">
                 {existingImages.map((image) => (
                   <div className="admin-image-item" key={image.id}>
-                    <img src={image.url} alt={image.alt_text || form.name} />
+                    <img src={resolveMediaUrl(image.url)} alt={image.alt_text || form.name} />
                     <button
                       type="button"
                       className="danger-link"
@@ -292,7 +292,7 @@ export default function CategoryProductsPanel({ category, products, onClose, onC
               <div className="category-product-item" key={product.id}>
                 <div className="category-product-thumb">
                   {product.image_url ? (
-                    <img src={product.image_url} alt={product.name} />
+                    <img src={resolveMediaUrl(product.image_url)} alt={product.name} />
                   ) : (
                     <span>{product.name.charAt(0)}</span>
                   )}

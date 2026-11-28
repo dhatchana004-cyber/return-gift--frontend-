@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import api, { getErrorMessage } from '../services/api';
+import api, { getErrorMessage, resolveMediaUrl } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -64,7 +64,7 @@ export default function ProductDetailsPage() {
         <span>{product.name}</span>
       </div>
       <div className="detail-layout">
-        <div className="detail-gallery"><div className="detail-image">{image ? <img src={image.url} alt={image.alt_text || product.name} /> : <div className="product-image-placeholder detail-placeholder"><span>V</span><small>VEDHIKA BRAND</small></div>}</div>{product.images.length > 1 && <div className="detail-thumbnails">{product.images.map((item) => <button key={item.id} className={image?.id === item.id ? 'active' : ''} onClick={() => setActiveImage(item)} aria-label={`View ${item.alt_text || product.name}`}><img src={item.url} alt="" /></button>)}</div>}</div>
+        <div className="detail-gallery"><div className="detail-image">{image ? <img src={resolveMediaUrl(image.url)} alt={image.alt_text || product.name} /> : <div className="product-image-placeholder detail-placeholder"><span>V</span><small>VEDHIKA BRAND</small></div>}</div>{product.images.length > 1 && <div className="detail-thumbnails">{product.images.map((item) => <button key={item.id} className={image?.id === item.id ? 'active' : ''} onClick={() => setActiveImage(item)} aria-label={`View ${item.alt_text || product.name}`}><img src={resolveMediaUrl(item.url)} alt="" /></button>)}</div>}</div>
         <div className="detail-copy"><p className="eyebrow">{product.category_name || 'VEDHIKA BRAND COLLECTION'}</p><h1>{product.name}</h1><p className="detail-price">{product.offer_percentage > 0 && <span className="detail-offer-badge">{product.offer_percentage}% OFF</span>}<strong>₹{Number(product.final_price ?? product.price).toLocaleString('en-IN')}</strong>{product.offer_percentage > 0 && <del>₹{Number(product.price).toLocaleString('en-IN')}</del>}</p><p className="detail-description">{product.description}</p><p className={`stock-note ${product.stock > 0 ? '' : 'out-of-stock'}`}><span />{product.stock > 0 ? `${product.stock} available` : 'Currently unavailable'}</p>
           {product.is_customizable && <div className="custom-note"><i className="bi bi-stars" /><span><strong>Made personal.</strong> Add a gift message or printed name at checkout.</span></div>}
           {error && <div className="alert alert-danger">{error}</div>}{message && <div className="alert alert-success">{message} <Link to="/wishlist">View wishlist</Link></div>}

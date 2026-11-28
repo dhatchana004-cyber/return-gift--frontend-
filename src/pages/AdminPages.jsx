@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import api, { getErrorMessage } from '../services/api';
+import api, { getErrorMessage, resolveMediaUrl } from '../services/api';
 import { useAdminFeedback } from '../components/AdminDialogs';
 import CategoryProductsPanel from '../components/CategoryProductsPanel';
 import defaultHeroGiftImg from '../assets/boutique-hero-gifts.png';
@@ -169,7 +169,7 @@ export function AdminProductsPage() {
   };
   return <><div className="admin-page-heading"><div><p className="eyebrow">YOUR COLLECTION</p><h1>Products</h1></div><div className="admin-product-heading-actions"><span>{products.length} total</span><button type="button" className="button button-dark" aria-expanded={formOpen} aria-controls="admin-product-form" onClick={() => { if (formOpen) reset(); else setFormOpen(true); }}>{formOpen ? 'Close form' : 'Add product'} <i className={`bi ${formOpen ? 'bi-x-lg' : 'bi-plus-lg'}`} /></button></div></div><AdminFeedback error={error || categoryState.error} />
     {formOpen && <form id="admin-product-form" className="admin-form-card" onSubmit={submit}><div className="admin-card-heading"><h3>{editing ? 'Edit this keepsake' : 'Add something lovely'}</h3>{editing && <button type="button" className="text-button" onClick={reset}>Cancel edit</button>}</div>
-      <div className="admin-product-form"><label>Product name<input required minLength="2" maxLength="180" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label><label>Occasion<select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })}><option value="">Choose category</option>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select></label><label>Price (₹)<input required type="number" min="0" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} /></label><label className="admin-offer-field">Offer percentage<input ref={offerInputRef} required type="number" min="0" max="100" step="1" value={form.offerPercentage} onChange={(e) => setForm({ ...form, offerPercentage: e.target.value })} /><span className="optional">Set to 0 to remove the offer.</span></label><label>Available stock<input required type="number" min="0" step="1" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} /></label><label className="admin-form-span">Description<textarea required minLength="10" maxLength="5000" rows="3" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></label>{editing && existingImages.length > 0 && <div className="admin-form-span"><span className="admin-image-label">Current product images</span><div className="admin-image-list">{existingImages.map((image) => <div className="admin-image-item" key={image.id}><img src={image.url} alt={image.alt_text || form.name} /><button type="button" className="danger-link" disabled={deletingImageId === image.id} onClick={() => removeImage(image)}>{deletingImageId === image.id ? 'Deleting…' : 'Delete image'} <i className="bi bi-trash" /></button></div>)}</div></div>}<label className="admin-form-span">Product images <span className="optional">(up to 5, max 5 MB each)</span><input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={(e) => setFiles(e.target.files)} /></label><label className="admin-check"><input type="checkbox" checked={form.isCustomizable} onChange={(e) => setForm({ ...form, isCustomizable: e.target.checked })} /> Supports printed names / gift messages</label><label className="admin-check"><input type="checkbox" checked={form.isTrending} onChange={(e) => setForm({ ...form, isTrending: e.target.checked })} /> <strong>Make as Trending</strong> (Feature in the homepage Trending Now section)</label>{editing && <label className="admin-check"><input type="checkbox" checked={form.isActive} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} /> Visible in the storefront</label>}</div>
+      <div className="admin-product-form"><label>Product name<input required minLength="2" maxLength="180" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label><label>Occasion<select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })}><option value="">Choose category</option>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}</option>)}</select></label><label>Price (₹)<input required type="number" min="0" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} /></label><label className="admin-offer-field">Offer percentage<input ref={offerInputRef} required type="number" min="0" max="100" step="1" value={form.offerPercentage} onChange={(e) => setForm({ ...form, offerPercentage: e.target.value })} /><span className="optional">Set to 0 to remove the offer.</span></label><label>Available stock<input required type="number" min="0" step="1" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} /></label><label className="admin-form-span">Description<textarea required minLength="10" maxLength="5000" rows="3" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></label>{editing && existingImages.length > 0 && <div className="admin-form-span"><span className="admin-image-label">Current product images</span><div className="admin-image-list">{existingImages.map((image) => <div className="admin-image-item" key={image.id}><img src={resolveMediaUrl(image.url)} alt={image.alt_text || form.name} /><button type="button" className="danger-link" disabled={deletingImageId === image.id} onClick={() => removeImage(image)}>{deletingImageId === image.id ? 'Deleting…' : 'Delete image'} <i className="bi bi-trash" /></button></div>)}</div></div>}<label className="admin-form-span">Product images <span className="optional">(up to 5, max 5 MB each)</span><input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={(e) => setFiles(e.target.files)} /></label><label className="admin-check"><input type="checkbox" checked={form.isCustomizable} onChange={(e) => setForm({ ...form, isCustomizable: e.target.checked })} /> Supports printed names / gift messages</label><label className="admin-check"><input type="checkbox" checked={form.isTrending} onChange={(e) => setForm({ ...form, isTrending: e.target.checked })} /> <strong>Make as Trending</strong> (Feature in the homepage Trending Now section)</label>{editing && <label className="admin-check"><input type="checkbox" checked={form.isActive} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} /> Visible in the storefront</label>}</div>
       <button className="button button-dark" disabled={busy}>{busy ? 'Saving...' : editing ? 'Save changes' : 'Add product'} <i className="bi bi-arrow-right" /></button>
     </form>}
     <div className="admin-section-card"><div className="admin-card-heading"><h3>All products</h3></div>{loading ? <p className="loading-copy">Loading products...</p> : products.length ? <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Product</th><th>Occasion</th><th>Price</th><th>Offer</th><th>Stock</th><th>Trending</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>{products.map((product) => <tr key={product.id}><td>{product.name}{product.is_customizable && <small>Personalizable</small>}</td><td>{product.category_name || '—'}</td><td>₹{Number(product.price).toLocaleString('en-IN')}</td><td>{product.offer_percentage > 0 ? `${product.offer_percentage}% OFF` : '—'}</td><td>{product.stock}</td><td><button type="button" className={`admin-trending-badge ${product.is_trending ? 'active' : ''}`} onClick={() => toggleTrending(product)} title="Click to toggle trending">{product.is_trending ? '★ Trending' : '☆ Make Trending'}</button></td><td><span className={`status-pill ${product.is_active ? 'status-delivered' : 'status-cancelled'}`}>{product.is_active ? 'Active' : 'Hidden'}</span></td><td className="table-actions"><button type="button" onClick={() => edit(product)}>Edit</button><button type="button" onClick={() => editOffer(product)}>{product.offer_percentage > 0 ? 'Edit offer' : 'Offer'}</button><button type="button" className="danger-link" onClick={() => remove(product)}>Remove</button></td></tr>)}</tbody></table></div> : <div className="admin-empty">No products yet. Add your first keepsake above.</div>}</div>
@@ -237,7 +237,7 @@ export function AdminCategoriesPage() {
   const { data, error, loading, reload } = useAdminData('/admin/categories');
   const productsState = useAdminData('/admin/products');
   const { notify, confirmDelete } = useAdminFeedback();
-  const [form, setForm] = useState({ name: '', description: '', price: '', offer_percentage: '0', is_trending: false });
+  const [form, setForm] = useState({ name: '', description: '', is_trending: false });
   const [imageFile, setImageFile] = useState(null);
   const [uploadingId, setUploadingId] = useState(null);
   const [togglingId, setTogglingId] = useState(null);
@@ -265,13 +265,11 @@ export function AdminCategoriesPage() {
       const name = form.name.trim();
       payload.append('name', name);
       payload.append('description', form.description.trim());
-      payload.append('price', form.price !== '' ? String(Number(form.price)) : '0');
-      payload.append('offer_percentage', form.offer_percentage !== '' ? String(Number(form.offer_percentage)) : '0');
       payload.append('is_trending', form.is_trending ? 'true' : 'false');
       if (imageFile) payload.append('image', imageFile);
       const { data: res } = await api.post('/admin/categories', payload);
       const createdId = res?.category?.id || null;
-      setForm({ name: '', description: '', price: '', offer_percentage: '0', is_trending: false });
+      setForm({ name: '', description: '', is_trending: false });
       setImageFile(null);
       if (createFileRef.current) createFileRef.current.value = '';
       notify.success(`Category "${name}" added. You can now add products inside it.`, 'Added');
@@ -312,8 +310,6 @@ export function AdminCategoriesPage() {
   const save = async (id) => {
     try {
       const patch = { ...(editing[id] || {}) };
-      if (patch.price !== undefined) patch.price = patch.price !== '' ? Number(patch.price) : 0;
-      if (patch.offer_percentage !== undefined) patch.offer_percentage = patch.offer_percentage !== '' ? Number(patch.offer_percentage) : 0;
       await api.patch(`/admin/categories/${id}`, patch);
       notify.success('Category updated.');
       await reload();
@@ -355,8 +351,6 @@ export function AdminCategoriesPage() {
       <h3>Add a category</h3>
       <div className="category-form-row">
         <label>Category name<input required minLength="2" maxLength="100" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Return Gifts" /></label>
-        <label>Amount (₹)<input type="number" min="0" step="0.01" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="e.g. 499" /></label>
-        <label>Offer (%)<input type="number" min="0" max="100" step="1" value={form.offer_percentage} onChange={(e) => setForm({ ...form, offer_percentage: e.target.value })} placeholder="0" /></label>
         <label>Upload image <span className="optional">(max 5 MB)</span><input ref={createFileRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => setImageFile(e.target.files?.[0] || null)} /></label>
         <label>Description<input maxLength="1000" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Brief description" /></label>
         <button className="button button-dark" disabled={busy}>{busy ? 'Adding...' : 'Add category'}</button>
@@ -382,14 +376,12 @@ export function AdminCategoriesPage() {
             <div className="category-admin-row">
               <div className="category-admin-thumb">
                 {category.image_url ? (
-                  <img src={category.image_url} alt={category.name} />
+                  <img src={resolveMediaUrl(category.image_url)} alt={category.name} />
                 ) : (
                   <span>{category.name.charAt(0)}</span>
                 )}
               </div>
               <label>Name<input value={editing[category.id]?.name ?? category.name} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], name: e.target.value } })} /></label>
-              <label className="category-admin-price-field">Amount (₹)<input type="number" min="0" step="0.01" value={editing[category.id]?.price ?? category.price ?? '0'} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], price: e.target.value } })} /></label>
-              <label className="category-admin-offer-field">Offer (%)<input type="number" min="0" max="100" step="1" value={editing[category.id]?.offer_percentage ?? category.offer_percentage ?? '0'} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], offer_percentage: e.target.value } })} /></label>
               <label>Description<input value={editing[category.id]?.description ?? category.description ?? ''} onChange={(e) => setEditing({ ...editing, [category.id]: { ...editing[category.id], description: e.target.value } })} /></label>
               <label className="category-upload-btn" title="Upload new category image">
                 <i className="bi bi-cloud-arrow-up" /> {uploadingId === category.id ? 'Uploading…' : 'Upload Image'}
